@@ -1,0 +1,35 @@
+package spring.securitystudy.member.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import spring.securitystudy.member.dto.MemberRegisterDto;
+import spring.securitystudy.member.entity.Member;
+import spring.securitystudy.member.repository.MemberRepository;
+
+@Service
+@RequiredArgsConstructor
+public class MemberService {
+
+    private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public Member register(MemberRegisterDto dto) {
+        if (memberRepository.findByUsername(dto.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 사용자 입니다.");
+        }
+
+        Member member = new Member();
+        member.createMember(dto, passwordEncoder);
+        memberRepository.save(member);
+
+        return member;
+    }
+
+    public Member findByUsername(String username){
+        return memberRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자를 찾을 수 없습니다."));
+    }
+}
