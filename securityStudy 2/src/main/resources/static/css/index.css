@@ -1,0 +1,61 @@
+/* 모바일 화면처럼 중앙에 고정된 레이아웃 */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    font-family: 'Arial', sans-serif;
+}
+
+/* 전체 컨테이너 */
+.container {
+    width: 375px;
+    min-height: 100vh;
+    background-color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 헤더 텍스트 */
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* 로그인/회원가입 섹션 */
+.auth-section {
+    text-align: center;
+    font-size: 0.95em;
+    color: #333;
+}
+
+.auth-section a {
+    color: #007bff;
+    text-decoration: none;
+    margin: 5px;
+}
+
+/* 사용자 정보 및 액션 */
+.user-section .welcome {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.post-button,
+.logout-button {
+    background-color: #0095f6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.9em;
+}

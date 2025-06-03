@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import spring.securitystudy.member.dto.MemberRegisterDto;
+import spring.securitystudy.post.entity.Post;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -16,9 +20,16 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToMany(mappedBy = "member")
+    private List<Post> postList = new ArrayList<>();
+
     public void createMember(MemberRegisterDto dto, PasswordEncoder passwordEncoder) {
         this.username = dto.getUsername();
         this.password = passwordEncoder.encode(dto.getPassword());
         this.role = Role.USER;
+    }
+
+    public void addPost(Post post) {
+        postList.add(post);
     }
 }

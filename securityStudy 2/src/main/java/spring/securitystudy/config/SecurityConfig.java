@@ -21,18 +21,19 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/","/login", "/register").permitAll()
-                        .anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/member/login", "/member/register").permitAll() // 그냥 가능
+                        .requestMatchers("/post/create", "/post/update").authenticated() // 인증해야 가능
+                        .anyRequest().authenticated() // 이외 요청은 인증해야 가능
                 )
                 .userDetailsService(memberDetailsService)
                 .formLogin(form -> form
-                        .loginPage("/login")
+                        .loginPage("/member/login")
                         .defaultSuccessUrl("/", true)
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
+                        .logoutUrl("/member/logout")
                         .logoutSuccessUrl("/")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")

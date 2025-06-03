@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>홈</title>
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+</head>
+
+<body>
+<div class="container">
+    <div class="header">
+        <h1>안녕하세요!</h1>
+    </div>
+
+    <div th:if="${username == null}" class="auth-section">
+        <p><a href="/member/login">로그인</a></p>
+        <p><a href="/member/register">회원가입</a></p>
+    </div>
+
+    <div th:if="${username != null}" class="user-section">
+        <div class="welcome">
+            <p th:text="'환영합니다, ' + ${username} + '님!'"></p>
+        </div>
+
+        <div class="actions">
+            <button class="post-button" onclick="location.href='/post/create'">글쓰기</button>
+            <form action="/member/logout" method="post">
+                <button type="submit" class="logout-button">로그아웃</button>
+            </form>
+        </div>
+
+        <div class="content">
+            <div th:each="post : ${posts}" class="post-card">
+                <h4 th:text="${post.getTitle()}">제목</h4>
+                <a th:if="${post.getWriter().equals(username)}">수정하기</a>
+                <p th:text="${post.getCreatedDate()}">작성일</p>
+                <p th:text="${post.getWriter()}">작성자</p>
+                <p th:text="${post.getContent()}">내용</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
