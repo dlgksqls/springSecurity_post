@@ -9,6 +9,7 @@ import spring.securitystudy.member.entity.Member;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Data
@@ -49,4 +50,17 @@ public class MemberDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MemberDetails that)) return false;
+        return Objects.equals(this.getUsername(), that.getUsername());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUsername());
+    }
+
 }

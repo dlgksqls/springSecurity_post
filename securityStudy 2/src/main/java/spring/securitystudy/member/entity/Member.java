@@ -32,4 +32,16 @@ public class Member {
     public void addPost(Post post) {
         postList.add(post);
     }
+
+    public void createFirstMember(PasswordEncoder passwordEncoder) {
+        this.username = "admin";
+        this.password = passwordEncoder.encode("1234");
+        this.role = Role.USER;
+    }
+
+    public void createSecondMember(PasswordEncoder passwordEncoder) {
+        this.username = "user";
+        this.password = passwordEncoder.encode("1234");
+        this.role = Role.USER;
+    }
 }

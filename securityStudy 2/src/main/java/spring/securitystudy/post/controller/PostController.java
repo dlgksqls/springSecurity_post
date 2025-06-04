@@ -3,14 +3,16 @@ package spring.securitystudy.post.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import spring.securitystudy.post.dto.PostCreateDto;
+import spring.securitystudy.post.dto.PostUpdateDto;
+import spring.securitystudy.post.entity.Post;
 import spring.securitystudy.post.service.PostService;
 
+import java.nio.channels.AcceptPendingException;
+import java.nio.file.AccessDeniedException;
 import java.security.Principal;
+import java.util.NoSuchElementException;
 
 @Controller
 @RequiredArgsConstructor
@@ -33,13 +35,25 @@ public class PostController {
         return "redirect:/";
     }
 
-    @GetMapping("/update")
-    public String postUpdateView(){
+    @GetMapping("/update/{id}")
+    public String postUpdateView(@PathVariable Long id, Principal principal, Model model) throws AccessDeniedException {
+        Post findPost = postService.findById(id);
+        if (findPost == null) {
+            throw new NoSuchElementException("게시글이 존재하지 않습니다.");
+        }
+
+        if (!findPost.getMember().getUsername().equals(principal.getName())) {
+            throw new AccessDeniedException("해당 게시글의 작성자만 수정할 수 있습니다.");
+        }
+
+        model.addAttribute("post", findPost);
         return "post/update";
     }
 
-    @PatchMapping("/update")
-    public String postUpdate(){
 
+    @PostMapping("/update")
+    public String updatePost(@RequestParam Long id, PostUpdateDto dto) {
+        postService.update(id, dto);
+        return "redirect:/";
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import spring.securitystudy.member.dto.MemberRegisterDto;
 import spring.securitystudy.member.entity.Member;
 import spring.securitystudy.member.repository.MemberRepository;
@@ -16,6 +17,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public Member register(MemberRegisterDto dto) {
         if (memberRepository.findByUsername(dto.getUsername()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 사용자 입니다.");

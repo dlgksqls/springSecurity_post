@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import spring.securitystudy.member.entity.Member;
 import spring.securitystudy.post.dto.PostCreateDto;
+import spring.securitystudy.post.dto.PostUpdateDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,5 +33,26 @@ public class Post {
         post.member = loginUser;
 
         return post;
+    }
+    public void updateContent(PostUpdateDto dto) {
+        this.title = dto.getTitle();
+        this.content = dto.getContent();
+        this.updatedDate = LocalDate.now();
+    }
+
+    public void createFirstPost(Member member) {
+        this.title = "첫 게시글";
+        this.content = "안녕하세요";
+        this.createdDate = LocalDate.now();
+        this.updatedDate = null;
+        this.member = member;
+    }
+
+    public void createSecondPost(Member member) {
+        this.title = "두번째 게시글";
+        this.content = "안녕하세요";
+        this.createdDate = LocalDate.now();
+        this.updatedDate = null;
+        this.member = member;
     }
 }

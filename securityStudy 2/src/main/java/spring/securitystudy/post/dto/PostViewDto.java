@@ -8,12 +8,14 @@ import java.time.LocalDate;
 
 @Data
 public class PostViewDto {
+    private Long id;
     private String title;
     private String content;
     private String writer;
     private LocalDate createdDate;
 
     public PostViewDto(Post post) {
+        this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.writer = post.getMember().getUsername();
