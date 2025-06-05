@@ -2,11 +2,13 @@ package spring.securitystudy.post.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import spring.securitystudy.comment.entity.Comment;
 import spring.securitystudy.member.entity.Member;
 import spring.securitystudy.post.dto.PostCreateDto;
 import spring.securitystudy.post.dto.PostUpdateDto;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,6 +26,9 @@ public class Post {
     @JoinColumn(name = "memberId")
     private Member member;
 
+    @OneToMany(mappedBy = "post")
+    private List<Comment> commentList = new ArrayList<>();
+
     public static Post create(PostCreateDto dto, Member loginUser) {
         Post post = new Post();
         post.title = dto.getTitle();
@@ -38,6 +43,9 @@ public class Post {
         this.title = dto.getTitle();
         this.content = dto.getContent();
         this.updatedDate = LocalDate.now();
+    }
+    public void addComment(Comment comment) {
+        this.commentList.add(comment);
     }
 
     public void createFirstPost(Member member) {

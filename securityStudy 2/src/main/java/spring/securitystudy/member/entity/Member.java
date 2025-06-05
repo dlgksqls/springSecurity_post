@@ -3,6 +3,7 @@ package spring.securitystudy.member.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import spring.securitystudy.comment.entity.Comment;
 import spring.securitystudy.member.dto.MemberRegisterDto;
 import spring.securitystudy.post.entity.Post;
 
@@ -23,6 +24,9 @@ public class Member {
     @OneToMany(mappedBy = "member")
     private List<Post> postList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member")
+    private List<Comment> commentList = new ArrayList<>();
+
     public void createMember(MemberRegisterDto dto, PasswordEncoder passwordEncoder) {
         this.username = dto.getUsername();
         this.password = passwordEncoder.encode(dto.getPassword());
@@ -31,6 +35,9 @@ public class Member {
 
     public void addPost(Post post) {
         postList.add(post);
+    }
+    public void addComment(Comment comment) {
+        this.commentList.add(comment);
     }
 
     public void createFirstMember(PasswordEncoder passwordEncoder) {
