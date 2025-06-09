@@ -33,4 +33,9 @@ public class Comment {
         this.post = findPost;
         this.member = findMember;
     }
+
+    public void update(String content) {
+        this.content = content;
+        this.updateDate = LocalDate.now();
+    }
 }

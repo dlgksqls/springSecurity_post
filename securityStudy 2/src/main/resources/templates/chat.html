@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>1:1 채팅</title>
+    <style>
+        #chatBox {
+            border: 1px solid #aaa;
+            width: 400px;
+            height: 300px;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        #inputArea {
+            display: flex;
+        }
+        #inputArea input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+<h2>채팅방</h2>
+<div id="chatBox"></div>
+
+<div id="inputArea">
+    <input type="text" id="messageInput" placeholder="메시지를 입력하세요" />
+    <button onclick="sendMessage()">전송</button>
+</div>
+
+<script>
+    let ws;
+    const chatRoomId = 1; // 예시 채팅방 ID
+    const username = prompt("사용자 이름을 입력하세요");
+
+    // DTO 형식
+    function createMessage(type, message) {
+        return JSON.stringify({
+            chatRoomId: chatRoomId,
+            sender: username,
+            message: message,
+            messageType: type // JOIN, CHAT, LEAVE
+        });
+    }
+
+    function connect() {
+        ws = new WebSocket("ws://localhost:8080/ws/conn");
+
+        ws.onopen = () => {
+            ws.send(createMessage("JOIN", ""));
+        };
+
+        ws.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+            const chatBox = document.getElementById("chatBox");
+            const div = document.createElement("div");
+            div.textContent = `[${msg.sender}] ${msg.message}`;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        };
+
+        ws.onclose = () => {
+            console.log("소켓 연결 종료됨");
+        };
+    }
+
+    function sendMessage() {
+        const content = document.getElementById("message").value;
+        const receiver = prompt("받는 사용자 이름:"); // 예시
+
+        const chatMessage = {
+            sender: username,
+            receiver: receiver,
+            message: content,
+            messageType: "CHAT"
+        };
+
+        socket.send(JSON.stringify(chatMessage));
+    }
+
+
+    window.addEventListener("beforeunload", () => {
+        if (ws) {
+            ws.send(createMessage("LEAVE", ""));
+            ws.close();
+        }
+    });
+
+    connect();
+</script>
+</body>
+</html>

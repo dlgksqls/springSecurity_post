@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import spring.securitystudy.comment.service.CommentService;
 
+import java.nio.file.AccessDeniedException;
 import java.security.Principal;
 
 @Controller
@@ -19,6 +20,15 @@ public class CommentController {
     public String createComment(Long postId, String content, Principal principal){
         commentService.create(postId, content, principal.getName());
 
+        return "redirect:/post/detail/" + postId;
+    }
+
+    @PostMapping("/edit")
+    public String editComment(Long commentId,
+                              String content,
+                              Principal principal) throws AccessDeniedException {
+        String currentUsername = principal.getName(); // 로그인한 사용자 이름
+        Long postId = commentService.update(commentId, content, currentUsername);
         return "redirect:/post/detail/" + postId;
     }
 }

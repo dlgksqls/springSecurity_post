@@ -50,6 +50,7 @@ public class PostController {
         List<PostCommentDto> commentList = new ArrayList<>();
         for (Comment comment : findPost.getCommentList()) {
             commentList.add(new PostCommentDto(
+                    comment.getId(),
                     comment.getMember().getUsername(),
                     comment.getCreatedDate(),
                     comment.getContent())
