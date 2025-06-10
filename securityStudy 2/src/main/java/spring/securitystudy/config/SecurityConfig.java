@@ -26,9 +26,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/member/login", "/member/register").permitAll() // 그냥 가능
-                        .requestMatchers("/post/create", "/post/update").authenticated() // 인증해야 가능
-                        .anyRequest().authenticated() // 이외 요청은 인증해야 가능
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/chat.html").permitAll()
+                        .requestMatchers("/", "/member/login", "/member/register", "/ws-stomp/**").permitAll()
+                        .requestMatchers("/post/create", "/post/update").authenticated()
+                        .anyRequest().authenticated()
                 )
                 .userDetailsService(memberDetailsService)
                 .formLogin(form -> form
@@ -50,6 +51,7 @@ public class SecurityConfig {
                 );
         return http.build();
     }
+
 
     @Bean
     public ServletListenerRegistrationBean<HttpSessionEventPublisher> httpSessionEventPublisher() {
