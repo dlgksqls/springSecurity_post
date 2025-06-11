@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import spring.securitystudy.comment.entity.Comment;
+import spring.securitystudy.friendship.entity.FriendShip;
 import spring.securitystudy.member.dto.MemberRegisterDto;
 import spring.securitystudy.post.entity.Post;
 
@@ -26,6 +27,12 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sendMember")
+    private List<FriendShip> sendList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "receiveMember")
+    private List<FriendShip> reveiveList = new ArrayList<>();
 
     public void createMember(MemberRegisterDto dto, PasswordEncoder passwordEncoder) {
         this.username = dto.getUsername();
@@ -50,5 +57,13 @@ public class Member {
         this.username = "user";
         this.password = passwordEncoder.encode("1234");
         this.role = Role.USER;
+    }
+
+    public void requestFriendShip(FriendShip newFriendShip) {
+        this.sendList.add(newFriendShip);
+    }
+
+    public void reveiveFriendShip(FriendShip newFriendShip) {
+        this.reveiveList.add(newFriendShip);
     }
 }

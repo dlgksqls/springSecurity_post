@@ -10,6 +10,8 @@ import spring.securitystudy.member.dto.MemberRegisterDto;
 import spring.securitystudy.member.entity.Member;
 import spring.securitystudy.member.repository.MemberRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -33,5 +35,14 @@ public class MemberService {
     public Member findByUsername(String username){
         return memberRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자를 찾을 수 없습니다."));
+    }
+    
+    public List<Member> findAll(){
+        return memberRepository.findAll();
+    }
+
+    public List<Member> findByUsernamePrefix(String username) {
+        return memberRepository.findByUsernamePrefix(username)
+                .orElseThrow(() -> new IllegalArgumentException("해당 이름을 가진 사용자는 없습니다."));
     }
 }

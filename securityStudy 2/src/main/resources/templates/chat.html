@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Spring Boot WebSocket 1:1 Chat</title>
+    <style>
+        #chatArea {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+        }
+
+        .chat-message {
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 10px;
+            max-width: 60%;
+            display: inline-block;
+            clear: both;
+            word-wrap: break-word;
+        }
+
+        .my-message {
+            background-color: #dcf8c6;
+            float: right;
+            text-align: right;
+        }
+
+        .other-message {
+            background-color: #f1f0f0;
+            float: left;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<h2>1:1 WebSocket Chat</h2>
+
+<div>
+    <label>내 이름 (로그인된 사용자):</label>
+    <input type="text" id="username" th:value="${username}" readonly />
+    <button onclick="connect()">Connect</button>
+    <button onclick="disconnect()">Disconnect</button>
+    <span id="connect-status" style="margin-left: 10px;">🔴 Disconnected</span>
+</div>
+
+<div>
+    <label>받는 사람:</label>
+    <select id="receiver" required>
+        <option value="" disabled selected>-- 수신자 선택 --</option>
+        <option th:each="member : ${memberList}"
+                th:value="${member.username}"
+                th:text="${member.username}">
+        </option>
+    </select>
+</div>
+
+<div>
+    <input type="text" id="message" placeholder="메시지 입력" />
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<div id="chatArea"></div>
+
+<script src="/webjars/sockjs-client/1.5.1/sockjs.js"></script>
+<script src="/webjars/stomp-websocket/2.3.4/stomp.js"></script>
+
+<script>
+    let stompClient = null;
+
+    function connect() {
+        if (stompClient && stompClient.connected) {
+            console.log("이미 연결되어 있습니다.");
+            return;
+        }
+
+        const socket = new SockJS("/ws-stomp");
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            document.getElementById("connect-status").innerHTML = "🟢 Connected";
+
+            stompClient.subscribe("/user/queue/messages", function (message) {
+                showMessage(JSON.parse(message.body));
+            });
+        }, function (error) {
+            console.error("STOMP error", error);
+            document.getElementById("connect-status").innerHTML = "🔴 Disconnected";
+        });
+    }
+
+    function disconnect() {
+        if (stompClient) {
+            stompClient.disconnect(() => {
+                console.log("Disconnected");
+                document.getElementById("connect-status").innerHTML = "🔴 Disconnected";
+                stompClient = null;
+            });
+        }
+    }
+
+
+    function sendMessage() {
+        const sender = document.getElementById("username").value.trim();
+        const receiver = document.getElementById("receiver").value.trim();
+        const content = document.getElementById("message").value.trim();
+
+        if (!receiver) {
+            alert("수신자를 선택해주세요.");
+            return;
+        }
+
+        if (stompClient && content && receiver) {
+            const chatMessage = {
+                sender: sender,
+                receiver: receiver,
+                content: content,
+                type: "CHAT"
+            };
+
+            stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
+            document.getElementById("message").value = '';
+        }
+    }
+
+    function showMessage(message) {
+        const chatArea = document.getElementById("chatArea");
+        const messageElement = document.createElement("div");
+
+        const currentUser = document.getElementById("username").value.trim();
+
+        messageElement.classList.add("chat-message");
+        if (message.sender === currentUser) {
+            messageElement.classList.add("my-message");
+        } else {
+            messageElement.classList.add("other-message");
+        }
+
+        messageElement.innerHTML = `<strong>${message.sender}:</strong> ${message.content}`;
+        chatArea.appendChild(messageElement);
+        chatArea.scrollTop = chatArea.scrollHeight; // 최신 메시지로 스크롤
+    }
+</script>
+</body>
+</html>

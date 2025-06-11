@@ -2,11 +2,20 @@ package spring.securitystudy.member.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import spring.securitystudy.friendship.service.FriendShipService;
 import spring.securitystudy.member.dto.MemberRegisterDto;
+import spring.securitystudy.member.entity.Member;
 import spring.securitystudy.member.service.MemberService;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -14,6 +23,7 @@ import spring.securitystudy.member.service.MemberService;
 public class MemberController {
 
     private final MemberService memberService;
+    private final FriendShipService friendShipService;
 
     @GetMapping("/register")
     public String registerView(){
@@ -29,5 +39,20 @@ public class MemberController {
     @GetMapping("/login")
     public String loginView(){
         return "member/login";
+    }
+
+    @GetMapping("/find")
+    public String findView(){
+        return "member/find";
+    }
+
+    @PostMapping("/find")
+    public String find(String username, Principal principal, Model model){
+        List<Member> findMemberList = memberService.findByUsernamePrefix(username);
+        Map<String, Boolean> findMemberStringList = new HashMap<>();
+
+        model.addAttribute("memberList", findMemberStringList);
+        model.addAttribute("isFriend", true);
+        return "member/find";
     }
 }
