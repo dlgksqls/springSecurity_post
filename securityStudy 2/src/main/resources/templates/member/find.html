@@ -1,0 +1,16 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div>
+    <form action="/member/find" method="post">
+        <input type="text" id="username" name="username" placeholder="이름을 입력해주세요.">
+        <button type="submit">검색</button>
+    </form>
+</div>
+
+<div th:if="${memberList != null}">
+    <div th:each="member : ${memberList}">
+        <strong><p th:text="${member}"></p></strong><a href="" th:if="!isFriend">친구 추가</a>
+    </div>
+</div>
+</body>
+</html>
