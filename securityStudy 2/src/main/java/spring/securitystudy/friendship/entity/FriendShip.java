@@ -1,11 +1,13 @@
 package spring.securitystudy.friendship.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import spring.securitystudy.member.entity.Member;
 
 import java.time.LocalDate;
 
 @Entity
+@Getter
 public class FriendShip {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
