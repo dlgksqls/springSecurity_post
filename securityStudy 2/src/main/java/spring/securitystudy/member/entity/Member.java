@@ -66,4 +66,12 @@ public class Member {
     public void reveiveFriendShip(FriendShip newFriendShip) {
         this.reveiveList.add(newFriendShip);
     }
+
+    public void removeReceive(Member requestMember) {
+        this.reveiveList.removeIf(member -> member.equals(requestMember));
+    }
+
+    public void removeRequest(Member loginMember) {
+        this.sendList.removeIf(member -> member.equals(loginMember));
+    }
 }

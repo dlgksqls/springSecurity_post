@@ -17,20 +17,17 @@
             <!-- 친구 상태가 null이면 요청 가능 -->
             <form th:if="${member.value == null}" th:action="@{/friendship/request}" method="post">
                 <input type="hidden" name="username" th:value="${member.key}" />
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <input type="hidden" name = "param" th:value="${member.key}">
+                <!--                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />-->
                 <button type="submit">친구 추가</button>
             </form>
 
             <!-- 친구 요청된 상태 표시 -->
-            <div th:if="${member.value == 'REQUEST'}">
-                <h3>요청됨</h3>
+<!--            <div th:if="${member.value.equals('REQUEST')}">-->
+            <div th:if="${member.value != null}">
+                <h3 th:if="${member.value.equals('REQUEST')}" th:text="'요청됨'"></h3>
+                <h3 th:if="${member.value.equals('ACCEPT')}" th:text="'친구'"></h3>
             </div>
-
-            <!-- 이미 친구인 경우 -->
-            <div th:if="${member.value == 'ACCEPT'}">
-                <h3>이미 친구입니다</h3>
-            </div>
-
         </div>
     </div>
 </div>

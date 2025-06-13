@@ -51,10 +51,16 @@ public class MemberController {
     @GetMapping("/find")
     public String find(String username, Principal principal, Model model) {
         List<Member> findMemberList = memberService.findByUsernamePrefix(username);
-        Map<String, Status> findMemberStringList = new HashMap<>();
+        Map<String, String> findMemberStringList = new HashMap<>();
 
         for (Member member : findMemberList) {
-            findMemberStringList.put(member.getUsername(), friendShipService.isFriendStatus(principal.getName(), member));
+            Status status = friendShipService.isFriendStatus(principal.getName(), member);
+            if (status != null) {
+                findMemberStringList.put(member.getUsername(), status.toString());
+            }
+            else {
+                findMemberStringList.put(member.getUsername(), null);
+            }
         }
 
         model.addAttribute("memberList", findMemberStringList);

@@ -31,4 +31,9 @@ public class FriendShip {
         this.createdDate = LocalDate.now();
         this.updateDate = null;
     }
+
+    public void accept() {
+        this.status = Status.ACCEPT;
+        this.updateDate = LocalDate.now();
+    }
 }

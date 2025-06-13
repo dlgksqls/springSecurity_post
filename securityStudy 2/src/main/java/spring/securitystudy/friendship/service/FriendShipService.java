@@ -41,6 +41,30 @@ public class FriendShipService {
         return friendShipRepository.findStatus(loginUser, member);
     }
 
+    @Transactional
+    public void acceptFriend(Member receiveMember, Member requestMember) {
+        FriendShip friendShip = friendShipRepository.findByLoginMemberAndRequestMember(receiveMember, requestMember);
+
+        if (friendShip.getStatus().name().equals("REQUEST")){
+            friendShip.accept();
+
+            receiveMember.removeReceive(requestMember);
+            requestMember.removeRequest(receiveMember);
+        }
+    }
+
+    @Transactional
+    public void rejectFriend(Member receiveMember, Member requestMember) {
+        FriendShip friendShip = friendShipRepository.findByLoginMemberAndRequestMember(receiveMember, requestMember);
+
+        if (friendShip.getStatus().name().equals("REQUEST")){
+            friendShipRepository.delete(friendShip);
+
+            receiveMember.removeReceive(requestMember);
+            requestMember.removeRequest(receiveMember);
+        }
+    }
+
     public Boolean isFriend(String loginUserName, Member member) {
         Member loginUser = memberRepository.findByUsername(loginUserName)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
