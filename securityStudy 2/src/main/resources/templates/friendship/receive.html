@@ -8,7 +8,7 @@
         <div th:each="receive : ${receiveList}">
             <div th:if="${receive.status.equals('REQUEST')}">
                 <form action="/friendship" method="post">
-                    <strong><input type="hidden" name="requestUsername" th:text="${receive.username}"></strong>
+                    <input type="hidden" name="requestUsername" th:value="${receive.username}" th:text="${receive.username}"/>
                     <button type="submit" name="action" value="accept">요청 수락</button>
                     <button type="submit" name="action" value="reject">요청 거부</button>
                 </form>

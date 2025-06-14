@@ -15,7 +15,7 @@
         <div th:if="${member.key != #authentication.name}">
 
             <!-- 친구 상태가 null이면 요청 가능 -->
-            <form th:if="${member.value == null}" th:action="@{/friendship/request}" method="post">
+            <form th:if="${member.value == null}" action="/friendship/request" method="post">
                 <input type="hidden" name="username" th:value="${member.key}" />
                 <input type="hidden" name = "param" th:value="${member.key}">
                 <!--                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />-->

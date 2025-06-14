@@ -1,6 +1,9 @@
 package spring.securitystudy.friendship.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +22,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/friendship")
+@Slf4j
 public class FriendShipController {
     private final FriendShipService friendShipService;
     private final MemberService memberService;
@@ -33,7 +37,6 @@ public class FriendShipController {
                 .toList();
 
         model.addAttribute("receiveList", receiveList);
-
         return "friendship/receive";
     }
 
@@ -42,13 +45,13 @@ public class FriendShipController {
         Member loginMember = memberService.findByUsername(principal.getName());
         Member requestMember = memberService.findByUsername(requestUsername);
 
-        if ("accept".equals(action)) {
+        if (action.equals("accept")) {
             friendShipService.acceptFriend(loginMember, requestMember);
-        } else if ("reject".equals(action)) {
+        } else if (action.equals("reject")) {
             friendShipService.rejectFriend(loginMember, requestMember);
         }
 
-        return "redirect:/friendship/receive";
+        return "redirect:/friendship";
     }
 
 
