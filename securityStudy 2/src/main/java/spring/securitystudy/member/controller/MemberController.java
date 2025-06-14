@@ -9,9 +9,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import spring.securitystudy.friendship.entity.Status;
 import spring.securitystudy.friendship.service.FriendShipService;
+import spring.securitystudy.member.dto.MemberProfile;
 import spring.securitystudy.member.dto.MemberRegisterDto;
 import spring.securitystudy.member.entity.Member;
 import spring.securitystudy.member.service.MemberService;
+import spring.securitystudy.post.dto.PostViewDto;
+import spring.securitystudy.post.entity.Post;
+import spring.securitystudy.post.service.PostService;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -25,6 +29,7 @@ import java.util.Map;
 public class MemberController {
 
     private final MemberService memberService;
+    private final PostService postService;
     private final FriendShipService friendShipService;
 
     @GetMapping("/register")
@@ -41,6 +46,24 @@ public class MemberController {
     @GetMapping("/login")
     public String loginView(){
         return "member/login";
+    }
+
+    @GetMapping("/profile/my")
+    public String profileView(Principal principal, Model model){
+        Member findMember = memberService.findByUsername(principal.getName());
+        List<Post> userPost = postService.findByUsername(findMember.getUsername());
+        List<PostViewDto> postDto = new ArrayList<>();
+        for (Post post : userPost) {
+            postDto.add(new PostViewDto(post));
+        }
+
+        MemberProfile memberProfile = MemberProfile.builder()
+                .username(findMember.getUsername())
+                .posts(postDto)
+                .role(findMember.getRole()).build();
+
+        model.addAttribute("memberProfile", memberProfile);
+        return "member/profile";
     }
 
 //    @GetMapping("/find")

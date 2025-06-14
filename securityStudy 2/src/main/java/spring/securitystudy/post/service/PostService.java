@@ -57,4 +57,8 @@ public class PostService {
 
         findPost.updateContent(dto);
     }
+
+    public List<Post> findByUsername(String username) {
+        return postRepository.findByUsername(username);
+    }
 }
