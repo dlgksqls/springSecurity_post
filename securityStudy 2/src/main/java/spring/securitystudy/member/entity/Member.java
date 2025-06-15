@@ -19,6 +19,7 @@ public class Member {
 
     private String username;
     private String password;
+    private boolean isFriendOnly = false;
     @Enumerated(EnumType.STRING)
     private Role role;
 

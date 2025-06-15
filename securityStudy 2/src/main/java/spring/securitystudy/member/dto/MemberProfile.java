@@ -13,5 +13,6 @@ import java.util.List;
 public class MemberProfile {
     private String username;
     private List<PostViewDto> posts = new ArrayList<>();
+    private boolean isFriendOnly;
     private Role role;
 }

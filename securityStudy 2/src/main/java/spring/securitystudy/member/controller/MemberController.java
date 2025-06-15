@@ -11,6 +11,7 @@ import spring.securitystudy.friendship.entity.Status;
 import spring.securitystudy.friendship.service.FriendShipService;
 import spring.securitystudy.member.dto.MemberProfile;
 import spring.securitystudy.member.dto.MemberRegisterDto;
+import spring.securitystudy.member.dto.MemberUpdateDto;
 import spring.securitystudy.member.entity.Member;
 import spring.securitystudy.member.service.MemberService;
 import spring.securitystudy.post.dto.PostViewDto;
@@ -48,8 +49,20 @@ public class MemberController {
         return "member/login";
     }
 
+    @GetMapping("/update")
+    public String updateView(Principal principal, Model model){
+        Member findMember = memberService.findByUsername(principal.getName());
+        MemberUpdateDto update = MemberUpdateDto.builder()
+                .username(findMember.getUsername())
+                .isFriendOnly(findMember.isFriendOnly())
+                .build();
+
+        model.addAttribute("update", update);
+        return "member/update";
+    }
+
     @GetMapping("/profile/my")
-    public String profileView(Principal principal, Model model){
+    public String myProfileView(Principal principal, Model model){
         Member findMember = memberService.findByUsername(principal.getName());
         List<Post> userPost = postService.findByUsername(findMember.getUsername());
         List<PostViewDto> postDto = new ArrayList<>();
@@ -60,10 +73,12 @@ public class MemberController {
         MemberProfile memberProfile = MemberProfile.builder()
                 .username(findMember.getUsername())
                 .posts(postDto)
-                .role(findMember.getRole()).build();
+                .role(findMember.getRole())
+                .isFriendOnly(findMember.isFriendOnly())
+                .build();
 
         model.addAttribute("memberProfile", memberProfile);
-        return "member/profile";
+        return "member/myProfile";
     }
 
 //    @GetMapping("/find")

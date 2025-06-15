@@ -1,0 +1,17 @@
+<html xmlns:th="http://www.thymeleaf.org">
+    <body>
+        <div th:if="${memberProfile} != null">
+            <h2 th:text="'ID: ' + ${memberProfile.username}"></h2><a href="/member/update">회원 정보 수정</a>
+            <h3 th:text="'ROLE: ' + ${memberProfile.role}"></h3>
+            <br>
+
+            <div th:if="${memberProfile.posts} != null">
+                <div th:each="post : ${memberProfile.posts}">
+                    <strong><h4 th:text="${post.title}"></h4></strong>
+                    <h5 th:text="${post.content}"></h5>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
