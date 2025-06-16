@@ -1,7 +1,8 @@
 package spring.securitystudy.member.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,10 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import spring.securitystudy.friendship.entity.Status;
 import spring.securitystudy.friendship.service.FriendShipService;
+import spring.securitystudy.member.MemberDetails;
 import spring.securitystudy.member.dto.MemberProfile;
 import spring.securitystudy.member.dto.MemberRegisterDto;
 import spring.securitystudy.member.dto.MemberUpdateDto;
 import spring.securitystudy.member.entity.Member;
+import spring.securitystudy.member.service.MemberDetailsService;
 import spring.securitystudy.member.service.MemberService;
 import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
@@ -52,13 +55,36 @@ public class MemberController {
     @GetMapping("/update")
     public String updateView(Principal principal, Model model){
         Member findMember = memberService.findByUsername(principal.getName());
-        MemberUpdateDto update = MemberUpdateDto.builder()
+        MemberUpdateDto updateMember = MemberUpdateDto.builder()
                 .username(findMember.getUsername())
-                .isFriendOnly(findMember.isFriendOnly())
+                .friendOnly(findMember.isFriendOnly())
                 .build();
 
-        model.addAttribute("update", update);
+        model.addAttribute("updateMember", updateMember);
         return "member/update";
+    }
+
+    @PostMapping("/update")
+    public String update(MemberUpdateDto dto, Principal principal, Model model){
+        memberService.update(principal.getName(), dto);
+        System.out.println("friendOnly = " + dto.isFriendOnly());
+
+        // 수정된 사용자
+        Member updateMember = memberService.findByUsername(dto.getUsername());
+
+        // 새로운 인증 정보 갱신 (사용자 이름이 바뀌면서,, 인증 정보를 갱신해야함) .. 왠만하면 아이디는 바꾸지 마라
+        MemberDetails memberDetails = new MemberDetails(updateMember);
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(
+                        memberDetails,
+                        null,
+                        memberDetails.getAuthorities()
+                );
+
+        // 현재 보안 컨텍스트에 새로운 인증 정보 설정
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        return "redirect:/member/profile/my";
     }
 
     @GetMapping("/profile/my")
@@ -67,7 +93,7 @@ public class MemberController {
         List<Post> userPost = postService.findByUsername(findMember.getUsername());
         List<PostViewDto> postDto = new ArrayList<>();
         for (Post post : userPost) {
-            postDto.add(new PostViewDto(post));
+            postDto.add(new PostViewDto(post, true));
         }
 
         MemberProfile memberProfile = MemberProfile.builder()

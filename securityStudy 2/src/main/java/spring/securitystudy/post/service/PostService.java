@@ -36,7 +36,8 @@ public class PostService {
         List<Post> allPost = postRepository.findAll();
 
         for (Post post : allPost) {
-            returnDto.add(new PostViewDto(post));
+            boolean isFriend = post.getMember().isFriendOnly();
+            returnDto.add(new PostViewDto(post, isFriend));
         }
 
         return returnDto;

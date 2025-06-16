@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/templates/chat.html").permitAll()
                         .requestMatchers("/", "/member/login", "/member/register", "/ws-stomp/**").permitAll()
-                        .requestMatchers("/post/create", "/post/update", "/friendship/**").authenticated()
+                        .requestMatchers("/post/create", "/post/update", "/friendship/**", "/member/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(memberDetailsService)

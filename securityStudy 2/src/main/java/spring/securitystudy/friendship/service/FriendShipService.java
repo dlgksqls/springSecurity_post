@@ -72,4 +72,8 @@ public class FriendShipService {
         Optional<FriendShip> friendShip = friendShipRepository.findFriendShip(loginUser, member, Status.ACCEPT);
         return friendShip.isPresent();
     }
+
+    public List<String> findFriendShipList(Member loginUser) {
+        return friendShipRepository.findFriendShipList(loginUser, Status.ACCEPT);
+    }
 }

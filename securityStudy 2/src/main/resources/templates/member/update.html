@@ -3,9 +3,10 @@
         <div>
             <form action="/member/update" method="post">
                 <label>Username:</label>
-                <input type="text" name="username" th:value="${update.username}">
+                <input type="text" name="username" th:value="${updateMember.username}">
                 <label>Friend Only:</label>
-                <input type="checkbox" name="isFriendOnly" th:checked="${update.friendOnly}">
+                <input type="hidden" name="_friendOnly" value="false"/>
+                <input type="checkbox" name="friendOnly" value="true" th:checked="${updateMember.friendOnly}"/>
                 <button type="submit">Update</button>
             </form>
         </div>

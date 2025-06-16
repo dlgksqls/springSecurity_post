@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import spring.securitystudy.comment.entity.Comment;
 import spring.securitystudy.friendship.entity.FriendShip;
 import spring.securitystudy.member.dto.MemberRegisterDto;
+import spring.securitystudy.member.dto.MemberUpdateDto;
 import spring.securitystudy.post.entity.Post;
 
 import java.util.ArrayList;
@@ -74,5 +75,10 @@ public class Member {
 
     public void removeRequest(Member loginMember) {
         this.sendList.removeIf(member -> member.equals(loginMember));
+    }
+
+    public void update(MemberUpdateDto dto) {
+        this.username = dto.getUsername();
+        this.isFriendOnly = dto.isFriendOnly();
     }
 }

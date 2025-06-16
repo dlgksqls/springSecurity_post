@@ -32,12 +32,18 @@
 
         <div class="content">
             <div th:each="post : ${posts}" class="post-card">
-                <h4 style="color: red" th:text="${post.getTitle()}">제목</h4>
-                <a th:if="${post.getWriter().equals(username)}" th:href="@{post/update/{id}(id=${post.id})}">수정</a>
-                <p th:text="${post.getCreatedDate()}">작성일</p>
-                <p th:text="${post.getWriter()}">작성자</p>
-                <p th:text="${post.getContent()}">내용</p>
-                <a th:href="@{post/detail/{id}(id=${post.id})}">자세히 보기</a>
+                <div th:if="
+                ${post.writer.equals(username) ||
+                (post.isFriend() && #arrays.contains(friendList, post.writer)) ||
+                !post.isFriend()}
+                ">
+                    <h4 style="color: red" th:text="${post.getTitle()}">제목</h4>
+                    <a th:if="${post.getWriter().equals(username)}" th:href="@{post/update/{id}(id=${post.id})}">수정</a>
+                    <p th:text="${post.getCreatedDate()}">작성일</p>
+                    <p th:text="${post.getWriter()}">작성자</p>
+                    <p th:text="${post.getContent()}">내용</p>
+                    <a th:href="@{post/detail/{id}(id=${post.id})}">자세히 보기</a>
+                </div>
             </div>
         </div>
     </div>

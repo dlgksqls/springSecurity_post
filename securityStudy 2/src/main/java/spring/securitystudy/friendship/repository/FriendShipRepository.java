@@ -7,6 +7,7 @@ import spring.securitystudy.friendship.entity.FriendShip;
 import spring.securitystudy.friendship.entity.Status;
 import spring.securitystudy.member.entity.Member;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,4 +43,11 @@ public interface FriendShipRepository extends JpaRepository<FriendShip, Long> {
             "JOIN FETCH fs.sendMember sm " +
             "WHERE rm = :loginUser AND sm = :member AND fs.status = :status")
     Optional<FriendShip> findFriendShip(@Param("loginUser") Member loginUser, @Param("member") Member member, @Param("status") Status status);
+
+    @Query("SELECT CASE " +
+            "WHEN fs.sendMember = :loginUser THEN fs.receiveMember.username ELSE fs.sendMember.username END " +
+            "FROM FriendShip fs " +
+            "WHERE (fs.sendMember = :loginUser OR fs.receiveMember = :loginUser) " +
+            "AND fs.status = :status")
+    ArrayList<String> findFriendShipList(@Param("loginUser") Member loginUser, @Param("status") Status status);
 }

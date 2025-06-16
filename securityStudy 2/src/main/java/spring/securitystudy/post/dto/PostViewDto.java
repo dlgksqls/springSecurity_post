@@ -11,14 +11,16 @@ public class PostViewDto {
     private Long id;
     private String title;
     private String content;
+    private boolean isFriend;
     private String writer;
     private LocalDate createdDate;
 
-    public PostViewDto(Post post) {
+    public PostViewDto(Post post, boolean isFriend) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.writer = post.getMember().getUsername();
+        this.isFriend = isFriend;
         this.createdDate = post.getCreatedDate();
     }
 }
