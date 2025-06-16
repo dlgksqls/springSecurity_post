@@ -15,7 +15,6 @@ import spring.securitystudy.member.dto.MemberProfile;
 import spring.securitystudy.member.dto.MemberRegisterDto;
 import spring.securitystudy.member.dto.MemberUpdateDto;
 import spring.securitystudy.member.entity.Member;
-import spring.securitystudy.member.service.MemberDetailsService;
 import spring.securitystudy.member.service.MemberService;
 import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
@@ -84,11 +83,11 @@ public class MemberController {
         // 현재 보안 컨텍스트에 새로운 인증 정보 설정
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-        return "redirect:/member/profile/my";
+        return "redirect:/member/profile";
     }
 
-    @GetMapping("/profile/my")
-    public String myProfileView(Principal principal, Model model){
+    @GetMapping("/profile")
+    public String profileView(Principal principal, Model model){
         Member findMember = memberService.findByUsername(principal.getName());
         List<Post> userPost = postService.findByUsername(findMember.getUsername());
         List<PostViewDto> postDto = new ArrayList<>();
@@ -104,7 +103,8 @@ public class MemberController {
                 .build();
 
         model.addAttribute("memberProfile", memberProfile);
-        return "member/myProfile";
+        model.addAttribute("loginUser", principal.getName());
+        return "member/profile";
     }
 
 //    @GetMapping("/find")

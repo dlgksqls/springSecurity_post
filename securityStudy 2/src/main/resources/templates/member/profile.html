@@ -1,9 +1,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <body>
         <div th:if="${memberProfile} != null">
-            <h2 th:text="'ID: ' + ${memberProfile.username}"></h2><a href="/member/update">회원 정보 수정</a>
+            <h2 th:text="'ID: ' + ${memberProfile.username}"></h2>
             <h3 th:text="'ROLE: ' + ${memberProfile.role}"></h3>
             <br>
+            <div th:if="${memberProfile.getUsername().equals(loginUser)}">
+                <a href="/member/update">수정하기</a>
+            </div>
 
             <div th:if="${memberProfile.posts} != null">
                 <div th:each="post : ${memberProfile.posts}">
