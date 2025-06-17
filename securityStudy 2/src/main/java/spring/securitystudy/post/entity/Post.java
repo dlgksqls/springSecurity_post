@@ -3,6 +3,7 @@ package spring.securitystudy.post.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import spring.securitystudy.comment.entity.Comment;
+import spring.securitystudy.image.entity.Image;
 import spring.securitystudy.member.entity.Member;
 import spring.securitystudy.post.dto.PostCreateDto;
 import spring.securitystudy.post.dto.PostUpdateDto;
@@ -26,8 +27,11 @@ public class Post {
     @JoinColumn(name = "memberId")
     private Member member;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<Image> imageList = new ArrayList<>();
 
     public static Post create(PostCreateDto dto, Member loginUser) {
         Post post = new Post();
@@ -62,5 +66,9 @@ public class Post {
         this.createdDate = LocalDate.now();
         this.updatedDate = null;
         this.member = member;
+    }
+
+    public void addImage(Image image) {
+        this.getImageList().add(image);
     }
 }

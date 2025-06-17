@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import spring.securitystudy.comment.entity.Comment;
+import spring.securitystudy.image.dto.ImageUploadDto;
 import spring.securitystudy.post.dto.PostCommentDto;
 import spring.securitystudy.post.dto.PostCreateDto;
 import spring.securitystudy.post.dto.PostUpdateDto;
@@ -31,11 +32,11 @@ public class PostController {
     }
 
     @PostMapping("/create")
-    public String postCreate(PostCreateDto dto, Principal principal){
+    public String postCreate(PostCreateDto postDto, ImageUploadDto imageDto, Principal principal){
         if (principal == null){
             throw new IllegalArgumentException("로그인을 해주세요.");
         }
-        postService.create(dto, principal.getName());
+        postService.create(postDto, imageDto, principal.getName());
         return "redirect:/";
     }
 

@@ -20,6 +20,9 @@
             <a th:if="*{member.username} == ${username}" th:href="@{/post/update/{id}(id=*{id})}">수정</a>
             <p th:text="*{createdDate}">작성일</p>
             <p th:text="*{member.username}">작성자</p>
+            <div th:each="image : ${post.getImageList()}">
+                <img th:src="@{${image.url}}" alt="이미지" style="max-width: 300px; margin-top: 10px;">
+            </div>
             <p th:text="*{content}">내용</p>
         </div>
 
