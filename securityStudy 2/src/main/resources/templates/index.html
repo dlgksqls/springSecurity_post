@@ -22,6 +22,8 @@
             <p th:text="'환영합니다, ' + ${username} + '님!'"></p>
             <a href="member/profile">내 정보</a><br>
             <a href="member/find">사용자 찾기</a>
+            <a href="friendship">친구 요청 목록</a>
+            <a href="friendship/allFriends">친구 목록</a>
         </div>
 
         <div class="actions">
@@ -44,7 +46,7 @@
                 <p th:text="${post.getContent()}">내용</p>
 
                 <!-- 이미지 출력 -->
-                <div th:each="image : ${post.imageUrls}">
+                <div th:if="${!post.imageUrls.isEmpty()}" th:each="image : ${post.imageUrls}">
                     <img th:src="@{${image}}" alt="이미지" style="max-width: 300px; margin-bottom: 10px;">
                 </div>
 

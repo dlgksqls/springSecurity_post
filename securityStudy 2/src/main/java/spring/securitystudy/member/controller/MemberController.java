@@ -72,7 +72,12 @@ public class MemberController {
         Member updateMember = memberService.findByUsername(dto.getUsername());
 
         // 새로운 인증 정보 갱신 (사용자 이름이 바뀌면서,, 인증 정보를 갱신해야함) .. 왠만하면 아이디는 바꾸지 마라
-        MemberDetails memberDetails = new MemberDetails(updateMember);
+        MemberDetails memberDetails = new MemberDetails(
+                updateMember.getUsername(),
+                updateMember.getPassword(),
+                updateMember.getRole().name(),
+                updateMember.isFriendOnly()
+        );
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
                         memberDetails,

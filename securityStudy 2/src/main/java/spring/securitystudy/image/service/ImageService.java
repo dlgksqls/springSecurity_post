@@ -28,7 +28,7 @@ public class ImageService {
         if (imageDto.getFiles() != null && !imageDto.getFiles().isEmpty()){
             for (MultipartFile file : imageDto.getFiles()) {
                 UUID uuid = UUID.randomUUID();
-                String imageFileName = uuid.toString();
+                String imageFileName = uuid.toString() + "." + "jpeg";
                 String fullPath = uploadPath + imageFileName;
 
                 try {

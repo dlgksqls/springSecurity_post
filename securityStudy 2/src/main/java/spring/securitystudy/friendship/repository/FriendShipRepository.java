@@ -50,4 +50,11 @@ public interface FriendShipRepository extends JpaRepository<FriendShip, Long> {
             "WHERE (fs.sendMember = :loginUser OR fs.receiveMember = :loginUser) " +
             "AND fs.status = :status")
     ArrayList<String> findFriendShipList(@Param("loginUser") Member loginUser, @Param("status") Status status);
+
+    @Query("SELECT DISTINCT fs FROM FriendShip fs " +
+            "JOIN FETCH fs.sendMember sm " +
+            "JOIN FETCH fs.receiveMember rm " +
+            "WHERE (sm.username = :username OR rm.username = :username) " +
+            "AND fs.status = 'ACCEPT'")  // 'FRIEND'는 친구 상태명 예시입니다
+    List<FriendShip> findAllFriendsByUsername(@Param("username") String username);
 }

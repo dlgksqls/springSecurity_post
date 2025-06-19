@@ -15,20 +15,24 @@ import java.util.Objects;
 @Data
 public class MemberDetails implements UserDetails {
 
-    private final Member member;
+    private final String username;
+    private final String password;
+    private final String role;
+    private final boolean isFriendOnly;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + member.getRole().name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
     @Override
     public String getPassword() {
-        return member.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return member.getUsername();
+        return username;
     }
 
     @Override

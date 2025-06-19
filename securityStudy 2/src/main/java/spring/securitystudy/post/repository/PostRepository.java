@@ -11,4 +11,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT p FROM Post p JOIN FETCH p.member WHERE p.member.username = :username")
     List<Post> findByUsername(@Param("username") String username);
+
+    @Query("SELECT p FROM Post p LEFT JOIN FETCH p.imageList")
+    List<Post> findAllWithImage();
 }

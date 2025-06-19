@@ -19,6 +19,11 @@ public class MemberDetailsService implements UserDetailsService {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저는 없습니다."));
 
-        return new MemberDetails(member);
+        return new MemberDetails(
+                member.getUsername(),
+                member.getPassword(),
+                member.getRole().name(),
+                member.isFriendOnly()
+        );
     }
 }

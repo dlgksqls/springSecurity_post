@@ -76,4 +76,8 @@ public class FriendShipService {
     public List<String> findFriendShipList(Member loginUser) {
         return friendShipRepository.findFriendShipList(loginUser, Status.ACCEPT);
     }
+
+    public List<FriendShip> findAllByUsername(String username) {
+        return friendShipRepository.findAllFriendsByUsername(username);
+    }
 }

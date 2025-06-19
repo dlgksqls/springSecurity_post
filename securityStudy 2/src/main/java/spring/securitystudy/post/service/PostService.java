@@ -3,10 +3,7 @@ package spring.securitystudy.post.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import spring.securitystudy.image.dto.ImageUploadDto;
-import spring.securitystudy.image.entity.Image;
-import spring.securitystudy.image.repository.ImageRepository;
 import spring.securitystudy.image.service.ImageService;
 import spring.securitystudy.member.entity.Member;
 import spring.securitystudy.member.service.MemberService;
@@ -16,12 +13,8 @@ import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
 import spring.securitystudy.post.repository.PostRepository;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +37,7 @@ public class PostService {
 
     public List<PostViewDto> findAll(){
         List<PostViewDto> returnDto = new ArrayList<>();
-        List<Post> allPost = postRepository.findAll();
+        List<Post> allPost = postRepository.findAllWithImage();
 
         for (Post post : allPost) {
             boolean isFriend = post.getMember().isFriendOnly();

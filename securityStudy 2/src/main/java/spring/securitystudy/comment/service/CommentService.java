@@ -21,18 +21,15 @@ public class CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
-    public void create(Long postId, String content, String username) {
+    public void create(Long postId, String content, Member member) {
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글은 존재하지 않습니다."));
 
-        Member findMember = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("해당 멤버는 존재하지 않습니다."));
-
         Comment comment = new Comment();
-        comment.create(findPost, content, findMember);
+        comment.create(findPost, content, member);
 
         findPost.addComment(comment);
-        findMember.addComment(comment);
+        member.addComment(comment);
 
         commentRepository.save(comment);
     }
