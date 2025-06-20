@@ -78,12 +78,12 @@ public class FriendShipController {
         for (FriendShip friendShip : allFriend) {
             if (!friendShip.getSendMember().getUsername().equals(memberDetails.getUsername())){
                 returnDto.add(new FriendShipReturnDto(
-                        friendShip.getReceiveMember().getUsername(), Status.ACCEPT)
+                        friendShip.getSendMember().getUsername(), Status.ACCEPT)
                 );
             }
             else {
                 returnDto.add(new FriendShipReturnDto(
-                        friendShip.getSendMember().getUsername(), Status.ACCEPT)
+                        friendShip.getReceiveMember().getUsername(), Status.ACCEPT)
                 );
             }
         }

@@ -20,7 +20,7 @@
     <div th:if="${username != null}" class="user-section">
         <div class="welcome">
             <p th:text="'환영합니다, ' + ${username} + '님!'"></p>
-            <a href="member/profile">내 정보</a><br>
+            <a th:href="@{member/profile/{username}(username=${username})}">내 정보</a><br>
             <a href="member/find">사용자 찾기</a>
             <a href="friendship">친구 요청 목록</a>
             <a href="friendship/allFriends">친구 목록</a>

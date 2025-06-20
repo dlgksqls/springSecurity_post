@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import spring.securitystudy.friendship.entity.Status;
@@ -91,9 +92,9 @@ public class MemberController {
         return "redirect:/member/profile";
     }
 
-    @GetMapping("/profile")
-    public String profileView(Principal principal, Model model){
-        Member findMember = memberService.findByUsername(principal.getName());
+    @GetMapping("/profile/{username}")
+    public String profileView(@PathVariable String username, Model model){
+        Member findMember = memberService.findByUsername(username);
         List<Post> userPost = postService.findByUsername(findMember.getUsername());
         List<PostViewDto> postDto = new ArrayList<>();
         for (Post post : userPost) {
@@ -108,7 +109,7 @@ public class MemberController {
                 .build();
 
         model.addAttribute("memberProfile", memberProfile);
-        model.addAttribute("loginUser", principal.getName());
+        model.addAttribute("loginUser", username);
         return "member/profile";
     }
 

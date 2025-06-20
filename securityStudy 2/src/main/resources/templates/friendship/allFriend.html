@@ -1,0 +1,13 @@
+<html xmlns:th="http://www.thymeleaf.org">
+    <div th:if="${friendList.isEmpty()}">
+        <h2>친구를 만들어보세요.</h2>
+        <a href="/member/find">친구 찾기</a>
+    </div>
+    <div th:if="${!friendList.isEmpty()}">
+        <div th:each="friend : ${friendList}">
+            <a th:href="@{/member/profile/{username}(username=${friend.username})}">
+                <h3 th:text="${friend.username}"></h3></a>
+            <h3 th:if="${friend.status.equals('ACCEPT')}">친 구</h3>
+        </div>
+    </div>
+</html>
