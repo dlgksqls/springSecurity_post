@@ -1,11 +1,13 @@
 package spring.securitystudy.post.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import spring.securitystudy.comment.entity.Comment;
 import spring.securitystudy.image.dto.ImageUploadDto;
+import spring.securitystudy.member.MemberDetails;
 import spring.securitystudy.post.dto.PostCommentDto;
 import spring.securitystudy.post.dto.PostCreateDto;
 import spring.securitystudy.post.dto.PostUpdateDto;

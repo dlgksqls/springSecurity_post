@@ -2,6 +2,7 @@
 
     import lombok.RequiredArgsConstructor;
     import org.springframework.security.core.annotation.AuthenticationPrincipal;
+    import org.springframework.security.core.context.SecurityContextHolder;
     import org.springframework.stereotype.Controller;
     import org.springframework.ui.Model;
     import org.springframework.web.bind.annotation.GetMapping;
@@ -29,9 +30,9 @@
         public String index(Model model,
                             @AuthenticationPrincipal MemberDetails memberDetails) {
             if (memberDetails != null) {
+                MemberDetails findMember = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
                 List<PostViewDto> allPost = postService.findAll();
-                Member loginUser = memberService.findByUsername(memberDetails.getUsername());
-                List<String> friendList = friendShipService.findFriendShipList(loginUser);
+                List<String> friendList = friendShipService.findFriendShipList(findMember.getMember());
 
                 model.addAttribute("username", memberDetails.getUsername());
                 model.addAttribute("posts", allPost);

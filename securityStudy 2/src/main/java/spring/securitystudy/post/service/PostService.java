@@ -25,10 +25,10 @@ public class PostService {
     private final ImageService imageService;
 
     @Transactional
-    public void create(PostCreateDto postDto, ImageUploadDto imageDto, String userName) {
-        Member loginUser = memberService.findByUsername(userName);
-        Post newPost = Post.create(postDto, loginUser);
+    public void create(PostCreateDto postDto, ImageUploadDto imageDto, String username) {
+        Member loginUser = memberService.findByUsername(username);
 
+        Post newPost = Post.create(postDto, loginUser);
         imageService.uploadImage(imageDto, newPost);
         loginUser.addPost(newPost);
 

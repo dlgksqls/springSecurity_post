@@ -6,6 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import spring.securitystudy.member.MemberDetails;
 import spring.securitystudy.member.dto.MemberRegisterDto;
 import spring.securitystudy.member.dto.MemberUpdateDto;
 import spring.securitystudy.member.entity.Member;
@@ -48,15 +49,8 @@ public class MemberService {
     }
 
     @Transactional
-    public void update(String username, MemberUpdateDto dto) {
-        if (!username.equals(dto.getUsername()) && isUsernameDuplicate(dto.getUsername())) {
-            throw new IllegalArgumentException("중복된 이름입니다.");
-        }
-
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("해당 이름을 가진 사용자는 없습니다."));
-
-        member.update(dto);
+    public void update(Member findMember, MemberUpdateDto dto) {
+        findMember.update(dto);
     }
 
     private boolean isUsernameDuplicate(String username) {

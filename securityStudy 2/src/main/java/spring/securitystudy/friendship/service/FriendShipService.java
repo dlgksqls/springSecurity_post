@@ -19,14 +19,17 @@ public class FriendShipService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void add(Member loginUser, Member receiveUser) {
+    public void add(String loginUser, Member receiveUser) {
         FriendShip newFriendShip = new FriendShip();
-        newFriendShip.save(loginUser, receiveUser);
+        Member requestUser = memberRepository.findByUsername(loginUser)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
+
+        newFriendShip.save(requestUser, receiveUser);
 
         friendShipRepository.save(newFriendShip);
 
-        loginUser.requestFriendShip(newFriendShip);
-        receiveUser.reveiveFriendShip(newFriendShip);
+        requestUser.requestFriendShip(newFriendShip);
+        receiveUser.receiveFriendShip(newFriendShip);
     }
 
 
@@ -34,11 +37,9 @@ public class FriendShipService {
         return friendShipRepository.findReceive(loginUserName, Status.REQUEST);
     }
 
-    public Status isFriendStatus(String loginUserName, Member member) {
-        Member loginUser = memberRepository.findByUsername(loginUserName)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
+    public Status isFriendStatus(Member loginMember, Member member) {
 
-        return friendShipRepository.findStatus(loginUser, member);
+        return friendShipRepository.findStatus(loginMember, member);
     }
 
     @Transactional

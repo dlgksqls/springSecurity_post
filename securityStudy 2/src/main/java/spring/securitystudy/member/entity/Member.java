@@ -65,7 +65,7 @@ public class Member {
         this.sendList.add(newFriendShip);
     }
 
-    public void reveiveFriendShip(FriendShip newFriendShip) {
+    public void receiveFriendShip(FriendShip newFriendShip) {
         this.reveiveList.add(newFriendShip);
     }
 

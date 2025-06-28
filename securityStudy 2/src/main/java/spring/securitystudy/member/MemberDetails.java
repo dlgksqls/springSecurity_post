@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import spring.securitystudy.member.entity.Member;
+import spring.securitystudy.member.entity.Role;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,24 +16,21 @@ import java.util.Objects;
 @Data
 public class MemberDetails implements UserDetails {
 
-    private final String username;
-    private final String password;
-    private final String role;
-    private final boolean isFriendOnly;
+    private final Member member;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + member.getRole()));
     }
 
     @Override
     public String getPassword() {
-        return password;
+        return member.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return member.getUsername();
     }
 
     @Override
@@ -58,13 +56,13 @@ public class MemberDetails implements UserDetails {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MemberDetails that)) return false;
-        return Objects.equals(this.getUsername(), that.getUsername());
+        if (!(o instanceof MemberDetails)) return false;
+        MemberDetails that = (MemberDetails) o;
+        return Objects.equals(this.getMember().getId(), that.getMember().getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUsername());
+        return Objects.hash(getMember().getId());
     }
-
 }

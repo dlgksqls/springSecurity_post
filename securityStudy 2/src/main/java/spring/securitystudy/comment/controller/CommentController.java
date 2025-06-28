@@ -2,6 +2,7 @@ package spring.securitystudy.comment.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,8 +25,8 @@ public class CommentController {
     @PostMapping("/create")
     public String createComment(Long postId, String content,
                                 @AuthenticationPrincipal MemberDetails memberDetails){
-        Member loginMember = memberService.findByUsername(memberDetails.getUsername());
-        commentService.create(postId, content, loginMember);
+        MemberDetails findMember = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        commentService.create(postId, content, findMember.getMember());
 
         return "redirect:/post/detail/" + postId;
     }
@@ -34,7 +35,8 @@ public class CommentController {
     public String editComment(Long commentId,
                               String content,
                               @AuthenticationPrincipal MemberDetails memberDetails) throws AccessDeniedException {
-        String currentUsername = memberDetails.getUsername(); // 로그인한 사용자 이름
+        MemberDetails findMember = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String currentUsername = findMember.getUsername();
         Long postId = commentService.update(commentId, content, currentUsername);
         return "redirect:/post/detail/" + postId;
     }

@@ -62,10 +62,11 @@ public class FriendShipController {
     @PostMapping("/request")
     public String requestFriend(@AuthenticationPrincipal MemberDetails memberDetails,
                                 String username, String param){
-        Member loginUser = memberService.findByUsername(memberDetails.getUsername());
+        MemberDetails findMember = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         Member receiveUser = memberService.findByUsername(username);
 
-        friendShipService.add(loginUser, receiveUser);
+        friendShipService.add(findMember.getUsername(), receiveUser);
 
         return "redirect:/member/find?username=" + param;
     }
