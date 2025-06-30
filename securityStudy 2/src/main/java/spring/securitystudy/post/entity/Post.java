@@ -2,6 +2,7 @@ package spring.securitystudy.post.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.hibernate.annotations.BatchSize;
 import spring.securitystudy.comment.entity.Comment;
 import spring.securitystudy.image.entity.Image;
 import spring.securitystudy.member.entity.Member;
@@ -31,6 +32,7 @@ public class Post {
     private List<Comment> commentList = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    @BatchSize(size = 10)
     private List<Image> imageList = new ArrayList<>();
 
     public static Post create(PostCreateDto dto, Member loginUser) {

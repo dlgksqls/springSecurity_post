@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import spring.securitystudy.friendship.entity.Status;
 import spring.securitystudy.friendship.service.FriendShipService;
+import spring.securitystudy.image.entity.Image;
 import spring.securitystudy.member.MemberDetails;
 import spring.securitystudy.member.dto.MemberProfile;
 import spring.securitystudy.member.dto.MemberRegisterDto;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -101,7 +103,8 @@ public class MemberController {
         List<Post> userPost = postService.findByUsername(findMember.getUsername());
         List<PostViewDto> postDto = new ArrayList<>();
         for (Post post : userPost) {
-            postDto.add(new PostViewDto(post, true));
+            List<String> imageUrls = post.getImageList().stream().map(Image::getUrl).collect(Collectors.toList());
+            postDto.add(new PostViewDto(post, imageUrls, true));
         }
 
         MemberProfile memberProfile = MemberProfile.builder()

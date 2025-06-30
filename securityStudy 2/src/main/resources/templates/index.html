@@ -53,6 +53,11 @@
                 <a th:href="@{post/detail/{id}(id=${post.id})}">자세히 보기</a>
             </div>
         </div>
+        <div class="pagination">
+            <a th:if="${currentPage > 0}" th:href="@{'/?page=' + ${currentPage - 1}}">Prev</a>
+            <span th:text="${currentPage + 1} + ' / ' + ${totalPages}"></span>
+            <a th:if="${currentPage + 1 < totalPages}" th:href="@{'/?page=' + ${currentPage + 1}}">Next</a>
+        </div>
     </div>
 </div>
 </body>

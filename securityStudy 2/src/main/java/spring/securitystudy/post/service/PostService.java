@@ -1,9 +1,13 @@
 package spring.securitystudy.post.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import spring.securitystudy.image.dto.ImageUploadDto;
+import spring.securitystudy.image.entity.Image;
 import spring.securitystudy.image.service.ImageService;
 import spring.securitystudy.member.entity.Member;
 import spring.securitystudy.member.service.MemberService;
@@ -15,6 +19,7 @@ import spring.securitystudy.post.repository.PostRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,16 +40,27 @@ public class PostService {
         postRepository.save(newPost);
     }
 
-    public List<PostViewDto> findAll(){
-        List<PostViewDto> returnDto = new ArrayList<>();
-        List<Post> allPost = postRepository.findAllWithImage();
+//    public List<PostViewDto> findAll(){
+//        List<PostViewDto> returnDto = new ArrayList<>();
+//        List<Post> allPost = postRepository.findAllWithMember();
+//
+//        for (Post post : allPost) {
+//            boolean isFriend = post.getMember().isFriendOnly();
+//            returnDto.add(new PostViewDto(post, isFriend));
+//        }
+//
+//        return returnDto;
+//    }
 
-        for (Post post : allPost) {
-            boolean isFriend = post.getMember().isFriendOnly();
-            returnDto.add(new PostViewDto(post, isFriend));
-        }
+    public Page<PostViewDto> findAllByPage(int page, int size){
+        PageRequest pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
+        Page<Post> pagePosts = postRepository.findAllWithMember(pageable);
 
-        return returnDto;
+        return pagePosts.map(post -> {
+            boolean isFriendOnly = post.getMember().isFriendOnly();
+            List<String> imageUrls = post.getImageList().stream().map(Image::getUrl).collect(Collectors.toList());
+            return new PostViewDto(post, imageUrls, isFriendOnly);
+        });
     }
 
     public Post findById(Long id) {

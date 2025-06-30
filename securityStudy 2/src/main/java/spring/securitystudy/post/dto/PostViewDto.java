@@ -19,15 +19,13 @@ public class PostViewDto {
     private List<String> imageUrls;
     private LocalDate createdDate;
 
-    public PostViewDto(Post post, boolean isFriend) {
+    public PostViewDto(Post post, List<String> imageUrls, boolean isFriend) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.writer = post.getMember().getUsername();
         this.isFriend = isFriend;
-        this.imageUrls = post.getImageList().stream()
-                .map(img -> img.getUrl())
-                .collect(Collectors.toList());
+        this.imageUrls = imageUrls;
         this.createdDate = post.getCreatedDate();
     }
 }
