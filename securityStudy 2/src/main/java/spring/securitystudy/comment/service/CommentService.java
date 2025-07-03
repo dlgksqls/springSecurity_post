@@ -40,7 +40,7 @@ public class CommentService {
 
         commentRepository.save(comment);
     }
-
+    ㄴㄴ
     @Transactional
     public Long update(Long commentId, String content, String username) throws AccessDeniedException {
         Comment findComment = commentRepository.findById(commentId)
