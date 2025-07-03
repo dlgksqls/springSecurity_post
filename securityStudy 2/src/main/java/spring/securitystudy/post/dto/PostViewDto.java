@@ -1,5 +1,6 @@
 package spring.securitystudy.post.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.cglib.core.Local;
 import spring.securitystudy.image.entity.Image;
@@ -18,6 +19,15 @@ public class PostViewDto {
     private String writer;
     private List<String> imageUrls;
     private LocalDate createdDate;
+
+    public PostViewDto(Long id, String title, String content, String writer, boolean isFriend, LocalDate createdDate) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.writer = writer;
+        this.isFriend = isFriend;
+        this.createdDate = createdDate;
+    }
 
     public PostViewDto(Post post, List<String> imageUrls, boolean isFriend) {
         this.id = post.getId();

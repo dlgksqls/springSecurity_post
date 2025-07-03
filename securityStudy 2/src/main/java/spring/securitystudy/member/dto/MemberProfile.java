@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 public class MemberProfile {
     private String username;
-    private List<PostViewDto> posts = new ArrayList<>();
+    private List<PostViewDto> posts;
     private boolean isFriendOnly;
     private Role role;
 }

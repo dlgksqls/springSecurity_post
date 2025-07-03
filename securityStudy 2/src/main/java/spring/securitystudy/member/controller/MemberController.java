@@ -1,35 +1,22 @@
 package spring.securitystudy.member.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import spring.securitystudy.friendship.entity.Status;
-import spring.securitystudy.friendship.service.FriendShipService;
-import spring.securitystudy.image.entity.Image;
+import org.springframework.web.bind.annotation.*;
 import spring.securitystudy.member.MemberDetails;
 import spring.securitystudy.member.dto.MemberProfile;
 import spring.securitystudy.member.dto.MemberRegisterDto;
 import spring.securitystudy.member.dto.MemberUpdateDto;
 import spring.securitystudy.member.entity.Member;
 import spring.securitystudy.member.service.MemberService;
-import spring.securitystudy.post.dto.PostViewDto;
-import spring.securitystudy.post.entity.Post;
-import spring.securitystudy.post.service.PostService;
+import spring.securitystudy.util.SecurityUtil;
+import spring.securitystudy.util.SecurityUtilImpl;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -37,8 +24,7 @@ import java.util.stream.Collectors;
 public class MemberController {
 
     private final MemberService memberService;
-    private final PostService postService;
-    private final FriendShipService friendShipService;
+    private final SecurityUtil securityUtil;
 
     @GetMapping("/register")
     public String registerView(){
@@ -57,9 +43,10 @@ public class MemberController {
     }
 
     @GetMapping("/update")
-    public String updateView(Principal principal, Model model){
-//        Member findMember = memberService.findByUsername(principal.getName());
-        MemberDetails findMember = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public String updateView(@AuthenticationPrincipal MemberDetails findMember,
+                             Model model){
+
+//        MemberDetails findMember = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         MemberUpdateDto updateMember = MemberUpdateDto.builder()
                 .username(findMember.getUsername())
@@ -71,78 +58,54 @@ public class MemberController {
     }
 
     @PostMapping("/update")
-    public String update(MemberUpdateDto dto, Principal principal, Model model){
-        Member loginMember = memberService.findByUsername(dto.getUsername());
+    public String update(MemberUpdateDto dto, Principal principal){
 
-        memberService.update(loginMember, dto);
-        System.out.println("friendOnly = " + dto.isFriendOnly());
+        memberService.update(principal.getName(), dto);
 
         // 수정된 사용자
         Member updateMember = memberService.findByUsername(dto.getUsername());
 
-        // 새로운 인증 정보 갱신 (사용자 이름이 바뀌면서,, 인증 정보를 갱신해야함) .. 왠만하면 아이디는 바꾸지 마라
-        MemberDetails memberDetails = new MemberDetails(updateMember);
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(
-                        memberDetails,
-                        null,
-                        memberDetails.getAuthorities()
-                );
+        // 정보를 수정했으므로 새로운 인증 정보 갱신
+        securityUtil.reAuthenticate(updateMember);
 
-        // 현재 보안 컨텍스트에 새로운 인증 정보 설정
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        return "redirect:/member/profile/" + principal.getName();
+    }
+
+    @PostMapping("/changeIsFriend")
+    public String isFriendOnly(@RequestParam(defaultValue = "false") boolean isFriendOnly,
+                               Principal principal){
+
+        Member loginMember = memberService.changeFriendOnly(principal.getName(), isFriendOnly);
+        securityUtil.reAuthenticate(loginMember);
 
         return "redirect:/member/profile/" + principal.getName();
     }
 
     @GetMapping("/profile/{username}")
-    public String profileView(Principal principal, @PathVariable String username, Model model){
-//        Member findMember = memberService.findByUsername(username);
-        MemberDetails findMember = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public String profileView(@AuthenticationPrincipal MemberDetails loginMember,
+                              @PathVariable String username,
+                              Model model){
 
-        List<Post> userPost = postService.findByUsername(findMember.getUsername());
-        List<PostViewDto> postDto = new ArrayList<>();
-        for (Post post : userPost) {
-            List<String> imageUrls = post.getImageList().stream().map(Image::getUrl).collect(Collectors.toList());
-            postDto.add(new PostViewDto(post, imageUrls, true));
-        }
-
-        MemberProfile memberProfile = MemberProfile.builder()
-                .username(findMember.getUsername())
-                .posts(postDto)
-                .role(findMember.getMember().getRole())
-                .isFriendOnly(findMember.getMember().isFriendOnly())
-                .build();
+        MemberProfile memberProfile = memberService.findPostByUsername(username);
 
         model.addAttribute("memberProfile", memberProfile);
-        model.addAttribute("loginUser", principal.getName());
+        model.addAttribute("loginUser", loginMember.getUsername());
+        model.addAttribute("isFriendOnly", loginMember.getMember().isFriendOnly());
+
         return "member/profile";
     }
 
-//    @GetMapping("/find")
-//    public String findView(){
-//        return "member/find";
-//    }
-
     @GetMapping("/find")
-    public String find(String username, Principal principal, Model model) {
-        MemberDetails findMember = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public String find(@AuthenticationPrincipal MemberDetails loginMember,
+                       String username,
+                       Model model) {
 
         List<Member> findMemberList = memberService.findByUsernamePrefix(username);
-        Map<String, String> findMemberStringList = new HashMap<>();
 
-        for (Member member : findMemberList) {
-            Status status = friendShipService.isFriendStatus(findMember.getMember(), member);
-            if (status != null) {
-                findMemberStringList.put(member.getUsername(), status.toString());
-            }
-            else {
-                findMemberStringList.put(member.getUsername(), null);
-            }
-        }
+        Map<String, String> findMemberStringList =
+                memberService.findFriendShipStatus(loginMember.getMember(), findMemberList);
 
         model.addAttribute("memberList", findMemberStringList);
         return "member/find";
     }
-
 }

@@ -38,7 +38,6 @@ public class FriendShipService {
     }
 
     public Status isFriendStatus(Member loginMember, Member member) {
-
         return friendShipRepository.findStatus(loginMember, member);
     }
 

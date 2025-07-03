@@ -1,20 +1,36 @@
 package spring.securitystudy.post.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import spring.securitystudy.comment.dto.CommentDto;
+import spring.securitystudy.image.dto.ImageUploadDto;
+import spring.securitystudy.image.dto.ImageUrlsDto;
+import spring.securitystudy.post.entity.Post;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class PostCommentDto {
     private Long id;
+    private String title;
+    private String postContent;
     private String username;
     private LocalDate createdDate;
-    private String content;
+    private LocalDate updatedDate;
+    private List<ImageUrlsDto> imageUrlsList;
+    private List<CommentDto> commentList;
 
-    public PostCommentDto(Long id, String username, LocalDate createdDate, String content) {
-        this.id = id;
-        this.username = username;
-        this.createdDate = createdDate;
-        this.content = content;
+    public PostCommentDto(Post post){
+        this.id = post.getId();
+        this.title = post.getTitle();
+        this.postContent = post.getContent();
+        this.username = post.getMember().getUsername();
+        this.createdDate = post.getCreatedDate();
+        this.updatedDate = post.getUpdatedDate();
+        this.imageUrlsList = new ArrayList<>();
+        this.commentList = new ArrayList<>();
     }
 }

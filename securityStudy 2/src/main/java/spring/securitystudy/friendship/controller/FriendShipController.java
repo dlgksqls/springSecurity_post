@@ -2,8 +2,6 @@ package spring.securitystudy.friendship.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.Banner;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -18,6 +16,7 @@ import spring.securitystudy.friendship.service.FriendShipService;
 import spring.securitystudy.member.MemberDetails;
 import spring.securitystudy.member.entity.Member;
 import spring.securitystudy.member.service.MemberService;
+import spring.securitystudy.member.service.MemberServiceImpl;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -28,6 +27,7 @@ import java.util.List;
 @RequestMapping("/friendship")
 @Slf4j
 public class FriendShipController {
+
     private final FriendShipService friendShipService;
     private final MemberService memberService;
 

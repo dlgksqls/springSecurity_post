@@ -4,6 +4,13 @@
             <h2 th:text="'ID: ' + ${memberProfile.username}"></h2>
             <h3 th:text="'ROLE: ' + ${memberProfile.role}"></h3>
             <br>
+            <div>
+                <form action="/member/changeIsFriend" method="post">
+                    <label>Friend Only:</label>
+                    <input type="checkbox" name="isFriendOnly" value="true" th:checked="${isFriendOnly}"/>
+                    <button type="submit">친구 공개 범위 수정</button>
+                </form>
+            </div>
             <div th:if="${memberProfile.getUsername().equals(loginUser)}">
                 <a href="/member/update">수정하기</a>
             </div>

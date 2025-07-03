@@ -1,7 +1,7 @@
 package spring.securitystudy.post.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +12,8 @@ import spring.securitystudy.post.dto.PostCommentDto;
 import spring.securitystudy.post.dto.PostCreateDto;
 import spring.securitystudy.post.dto.PostUpdateDto;
 import spring.securitystudy.post.entity.Post;
-import spring.securitystudy.post.service.PostService;
+import spring.securitystudy.post.service.PostServiceImpl;
 
-import java.nio.channels.AcceptPendingException;
 import java.nio.file.AccessDeniedException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ import java.util.NoSuchElementException;
 @RequestMapping("/post")
 public class PostController {
 
-    private final PostService postService;
+    private final PostServiceImpl postService;
 
     @GetMapping("/create")
     public String postCreateView(){
@@ -34,35 +33,26 @@ public class PostController {
     }
 
     @PostMapping("/create")
-    public String postCreate(PostCreateDto postDto, ImageUploadDto imageDto, Principal principal){
-        if (principal == null){
+    public String postCreate(@AuthenticationPrincipal MemberDetails loginMember,
+                             PostCreateDto postDto,
+                             ImageUploadDto imageDto){
+        if (loginMember == null){
             throw new IllegalArgumentException("로그인을 해주세요.");
         }
-        postService.create(postDto, imageDto, principal.getName());
+        postService.create(postDto, imageDto, loginMember.getUsername());
         return "redirect:/";
     }
 
     @GetMapping("/detail/{id}")
     public String postDetailView(@PathVariable Long id, Principal principal, Model model){
-        Post findPost = postService.findById(id);
+        PostCommentDto postCommentList = postService.findCommentPost(id);
 
-        if (findPost == null){
+        if (postCommentList == null){
             throw new NoSuchElementException("게시글이 존재하지 않습니다.");
         }
 
-        List<PostCommentDto> commentList = new ArrayList<>();
-        for (Comment comment : findPost.getCommentList()) {
-            commentList.add(new PostCommentDto(
-                    comment.getId(),
-                    comment.getMember().getUsername(),
-                    comment.getCreatedDate(),
-                    comment.getContent())
-            );
-        }
-
-        model.addAttribute("post", findPost);
+        model.addAttribute("postComment", postCommentList);
         model.addAttribute("username", principal.getName());
-        model.addAttribute("comments", commentList);
         return "post/detail";
     }
 

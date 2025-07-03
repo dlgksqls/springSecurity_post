@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
 
 import java.util.List;
@@ -22,8 +23,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * Post 10개에 Image 20개 있으면 → 결과 row는 20개 (중복된 Post가 생김) => error
      */
     @Query(
-            value = "SELECT p FROM Post p JOIN FETCH p.member",
+            value = "SELECT new spring.securitystudy.post.dto.PostViewDto(p.id, p.title, p.content, p.member.username, p.member.isFriendOnly, p.createdDate) " +
+                    "FROM Post p JOIN p.member m " +
+                    "ORDER BY p.id DESC",
             countQuery = "SELECT COUNT(p) FROM Post p"
     )
-    Page<Post> findAllWithMember(Pageable pageable);
+    Page<PostViewDto> findAllWithMember(Pageable pageable);
+
 }

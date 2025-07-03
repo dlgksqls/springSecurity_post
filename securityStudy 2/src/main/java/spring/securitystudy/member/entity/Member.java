@@ -81,4 +81,9 @@ public class Member {
         this.username = dto.getUsername();
         this.isFriendOnly = dto.isFriendOnly();
     }
+
+    public void changeFriendOnly(boolean friendOnly) {
+        if (this.isFriendOnly == friendOnly) return;
+        this.isFriendOnly = friendOnly;
+    }
 }

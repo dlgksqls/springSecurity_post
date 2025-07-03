@@ -10,14 +10,12 @@
     import org.springframework.web.bind.annotation.RequestParam;
     import spring.securitystudy.friendship.service.FriendShipService;
     import spring.securitystudy.member.MemberDetails;
-    import spring.securitystudy.member.entity.Member;
     import spring.securitystudy.member.service.MemberService;
+    import spring.securitystudy.member.service.MemberServiceImpl;
     import spring.securitystudy.post.dto.PostViewDto;
-    import spring.securitystudy.post.entity.Post;
     import spring.securitystudy.post.service.PostService;
+    import spring.securitystudy.post.service.PostServiceImpl;
 
-    import java.security.Principal;
-    import java.util.ArrayList;
     import java.util.List;
 
     @Controller

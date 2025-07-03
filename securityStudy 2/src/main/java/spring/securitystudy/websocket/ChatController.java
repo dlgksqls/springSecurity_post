@@ -2,16 +2,13 @@ package spring.securitystudy.websocket;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import spring.securitystudy.member.entity.Member;
-import spring.securitystudy.member.repository.MemberRepository;
-import spring.securitystudy.member.service.MemberService;
+import spring.securitystudy.member.service.MemberServiceImpl;
 
 import java.security.Principal;
 import java.util.List;
@@ -21,7 +18,7 @@ import java.util.List;
 @RequestMapping("/chat")
 public class ChatController {
 
-    private final MemberService memberService;
+    private final MemberServiceImpl memberService;
     private final SimpMessagingTemplate messagingTemplate;
 
     @GetMapping("")
