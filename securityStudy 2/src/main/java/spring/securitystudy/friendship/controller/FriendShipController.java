@@ -29,16 +29,11 @@ import java.util.List;
 public class FriendShipController {
 
     private final FriendShipService friendShipService;
-    private final MemberService memberService;
+//    private final MemberService memberService;
 
     @GetMapping("")
     public String receiveFriendView(Principal principal, Model model){
-        List<FriendShip> receiveHistory = friendShipService.findByUsername(principal.getName());
-        List<FriendShipReturnDto> receiveList = receiveHistory.stream()
-                .map(friendShip -> new FriendShipReturnDto(
-                        friendShip.getSendMember().getUsername(),
-                        friendShip.getStatus()))
-                .toList();
+        List<FriendShipReturnDto> receiveList = friendShipService.findByUsername(principal.getName());
 
         model.addAttribute("receiveList", receiveList);
         return "friendship/receive";
@@ -46,14 +41,15 @@ public class FriendShipController {
 
     @PostMapping("")
     public String handleFriendRequest(@AuthenticationPrincipal MemberDetails memberDetails,
-                                      String requestUsername, String action) {
-        Member loginMember = memberService.findByUsername(memberDetails.getUsername());
-        Member requestMember = memberService.findByUsername(requestUsername);
+                                      String requestUsername,
+                                      String action) {
+
+        String loginUsername = memberDetails.getUsername();
 
         if (action.equals("accept")) {
-            friendShipService.acceptFriend(loginMember, requestMember);
+            friendShipService.acceptFriend(loginUsername, requestUsername);
         } else if (action.equals("reject")) {
-            friendShipService.rejectFriend(loginMember, requestMember);
+            friendShipService.rejectFriend(loginUsername, requestUsername);
         }
 
         return "redirect:/friendship";

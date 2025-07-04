@@ -8,7 +8,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import spring.securitystudy.comment.dto.CommentDto;
-import spring.securitystudy.comment.entity.Comment;
 import spring.securitystudy.image.dto.ImageUploadDto;
 import spring.securitystudy.image.dto.ImageUrlsDto;
 import spring.securitystudy.image.entity.Image;
@@ -91,21 +90,11 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostCommentDto findCommentPost(Long id) {
-        List<Comment> postComment = postRepository.findCommentByPostId(id);
-        List<Image> postImage = postRepository.findImageByImageId(id);
-        PostCommentDto postCommentDto = new PostCommentDto(findPost);
+        Post findPost = findById(id);
+        List<CommentDto> postComment = postRepository.findCommentByPostId(id);
+        List<ImageUrlsDto> postImage = postRepository.findImageByPostId(id);
 
-        log.info("comment find");
-        List<Comment> commentList = findPost.getCommentList();
-        for (Comment comment : commentList) {
-            postCommentDto.getCommentList().add(new CommentDto(comment));
-        }
-
-        log.info("image find");
-        List<Image> imageList = findPost.getImageList();
-        for (Image image : imageList) {
-            postCommentDto.getImageUrlsList().add(new ImageUrlsDto(image.getUrl()));
-        }
+        PostCommentDto postCommentDto = new PostCommentDto(findPost, postImage, postComment);
 
         return postCommentDto;
     }

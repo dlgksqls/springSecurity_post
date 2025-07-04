@@ -5,8 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import spring.securitystudy.comment.entity.Comment;
-import spring.securitystudy.image.entity.Image;
+import spring.securitystudy.comment.dto.CommentDto;
+import spring.securitystudy.image.dto.ImageUrlsDto;
 import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
 
@@ -32,9 +32,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     )
     Page<PostViewDto> findAllWithMember(Pageable pageable);
 
-    @Query(value = "SELECT c FROM Comment c JOIN FETCH c.member cm WHERE c.post.id = :id")
-    List<Comment> findCommentByPostId (@Param(value = "id") Long id);
+    @Query(value = "SELECT new spring.securitystudy.comment.dto.CommentDto(c.id, c.content, c.member.username, c.createdDate, c.updateDate) " +
+            "FROM Comment c JOIN c.member cm " +
+            "WHERE c.post.id = :id " +
+            "ORDER BY c.createdDate DESC")
+    List<CommentDto> findCommentByPostId (@Param(value = "id") Long id);
 
-    @Query(value = "SELECT i FROM Image i WHERE i.post.id = :id")
-    List<Image> findImageByImageId(@Param(value = "id") Long id);
+    @Query(value = "SELECT new spring.securitystudy.image.dto.ImageUrlsDto(i.url) " +
+            "FROM Image i " +
+            "WHERE i.post.id = :id")
+    List<ImageUrlsDto> findImageByPostId(@Param(value = "id") Long id);
 }

@@ -3,6 +3,7 @@ package spring.securitystudy.friendship.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import spring.securitystudy.friendship.dto.FriendShipReturnDto;
 import spring.securitystudy.friendship.entity.FriendShip;
 import spring.securitystudy.friendship.entity.Status;
 import spring.securitystudy.friendship.repository.FriendShipRepository;
@@ -15,6 +16,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class FriendShipService {
+
     private final FriendShipRepository friendShipRepository;
     private final MemberRepository memberRepository;
 
@@ -33,8 +35,14 @@ public class FriendShipService {
     }
 
 
-    public List<FriendShip> findByUsername(String loginUserName) {
-        return friendShipRepository.findReceive(loginUserName, Status.REQUEST);
+    public List<FriendShipReturnDto> findByUsername(String loginUserName) {
+        List<FriendShip> receiveList = friendShipRepository.findReceive(loginUserName, Status.REQUEST);
+        return receiveList.stream()
+                .map(friendShip -> new FriendShipReturnDto(
+                        friendShip.getSendMember().getUsername(),
+                        friendShip.getStatus()
+                        )
+                ).toList();
     }
 
     public Status isFriendStatus(Member loginMember, Member member) {
@@ -42,27 +50,41 @@ public class FriendShipService {
     }
 
     @Transactional
-    public void acceptFriend(Member receiveMember, Member requestMember) {
-        FriendShip friendShip = friendShipRepository.findByLoginMemberAndRequestMember(receiveMember, requestMember);
+    public void acceptFriend(String receiveMemberName, String requestMemberName) {
+        FriendShip friendShip = findMembersRelation(receiveMemberName, requestMemberName);
 
-        if (friendShip.getStatus().name().equals("REQUEST")){
+        if (friendShip.getStatus() == Status.ACCEPT){
             friendShip.accept();
 
-            receiveMember.removeReceive(requestMember);
-            requestMember.removeRequest(receiveMember);
+            removeFriendShipCollection(friendShip);
         }
     }
 
     @Transactional
-    public void rejectFriend(Member receiveMember, Member requestMember) {
-        FriendShip friendShip = friendShipRepository.findByLoginMemberAndRequestMember(receiveMember, requestMember);
+    public void rejectFriend(String receiveMemberName, String requestMemberName) {
 
-        if (friendShip.getStatus().name().equals("REQUEST")){
+        FriendShip friendShip = findMembersRelation(receiveMemberName, requestMemberName);
+
+        if (friendShip.getStatus() == Status.BLOCKED){
             friendShipRepository.delete(friendShip);
 
-            receiveMember.removeReceive(requestMember);
-            requestMember.removeRequest(receiveMember);
+            removeFriendShipCollection(friendShip);
         }
+    }
+
+    private FriendShip findMembersRelation(String receiveMemberName, String requestMemberName) {
+        Member receiveMember = memberRepository.findByUsername(receiveMemberName)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
+
+        Member requestMember = memberRepository.findByUsername(requestMemberName)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
+
+        return friendShipRepository.findByLoginMemberAndRequestMember(receiveMember, requestMember);
+    }
+
+    private static void removeFriendShipCollection(FriendShip friendShip) {
+        friendShip.getReceiveMember().removeReceive(friendShip.getSendMember());
+        friendShip.getSendMember().removeRequest(friendShip.getReceiveMember());
     }
 
     public Boolean isFriend(String loginUserName, Member member) {
