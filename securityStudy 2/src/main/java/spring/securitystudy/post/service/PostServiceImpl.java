@@ -91,7 +91,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostCommentDto findCommentPost(Long id) {
-        Post findPost = findById(id);
+        List<Comment> postComment = postRepository.findCommentByPostId(id);
+        List<Image> postImage = postRepository.findImageByImageId(id);
         PostCommentDto postCommentDto = new PostCommentDto(findPost);
 
         log.info("comment find");
