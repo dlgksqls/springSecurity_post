@@ -1,22 +1,22 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div>
-    <form method="get" action="/member/find">
+    <form method="get" action="/user/find">
         <input type="text" name="username" placeholder="이름 입력">
         <button type="submit">검색</button>
     </form>
 </div>
 
-<div th:if="${memberList != null}">
-    <div th:each="member : ${memberList}">
-        <strong><p th:text="${member.key}"></p></strong>
+<div th:if="${userList != null}">
+    <div th:each="user : ${userList}">
+        <strong><p th:text="${user.key}"></p></strong>
 
         <!-- 로그인한 유저는 제외 -->
-        <div th:if="${member.key != #authentication.name}">
+        <div th:if="${user.key != #authentication.name}">
 
             <!-- 친구 상태가 null이면 요청 가능 -->
-            <form th:if="${member.value == null}" action="/friendship/request" method="post">
-                <input type="hidden" name="username" th:value="${member.key}" />
+            <form th:if="${user.value == null}" action="/friendship/request" method="post">
+                <input type="hidden" name="receiveMemberName" th:value="${user.key}" />
                 <input type="hidden" name = "param" th:value="${param.username}">
                 <!--                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />-->
                 <button type="submit">친구 추가</button>
@@ -24,9 +24,9 @@
 
             <!-- 친구 요청된 상태 표시 -->
 <!--            <div th:if="${member.value.equals('REQUEST')}">-->
-            <div th:if="${member.value != null}">
-                <h3 th:if="${member.value.equals('REQUEST')}" th:text="'요청됨'"></h3>
-                <h3 th:if="${member.value.equals('ACCEPT')}" th:text="'친구'"></h3>
+            <div th:if="${user.value != null}">
+                <h3 th:if="${user.value.equals('REQUEST')}" th:text="'요청됨'"></h3>
+                <h3 th:if="${user.value.equals('ACCEPT')}" th:text="'친구'"></h3>
             </div>
         </div>
     </div>

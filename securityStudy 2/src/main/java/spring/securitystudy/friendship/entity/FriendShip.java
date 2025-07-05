@@ -2,7 +2,7 @@ package spring.securitystudy.friendship.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import spring.securitystudy.member.entity.Member;
+import spring.securitystudy.user.entity.User;
 
 import java.time.LocalDate;
 
@@ -14,19 +14,19 @@ public class FriendShip {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Member sendMember;
+    private User sendUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Member receiveMember;
+    private User receiveUser;
 
     @Enumerated(value = EnumType.STRING)
     private Status status;
     private LocalDate createdDate;
     private LocalDate updateDate;
 
-    public void save(Member loginUser, Member receiveUser) {
-        this.sendMember = loginUser;
-        this.receiveMember = receiveUser;
+    public void save(User loginUser, User receiveUser) {
+        this.sendUser = loginUser;
+        this.receiveUser = receiveUser;
         this.status = Status.REQUEST;
         this.createdDate = LocalDate.now();
         this.updateDate = null;

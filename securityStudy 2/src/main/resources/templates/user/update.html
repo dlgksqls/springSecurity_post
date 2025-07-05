@@ -1,12 +1,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <body>
         <div>
-            <form action="/member/update" method="post">
+            <form action="/user/update" method="post">
                 <label>Username:</label>
-                <input type="text" name="username" th:value="${updateMember.username}">
+                <input type="text" name="username" th:value="${updateUser.username}">
                 <label>Friend Only:</label>
                 <input type="hidden" name="_friendOnly" value="false"/>
-                <input type="checkbox" name="friendOnly" value="true" th:checked="${updateMember.friendOnly}"/>
+                <input type="checkbox" name="friendOnly" value="true" th:checked="${updateUser.friendOnly}"/>
                 <button type="submit">Update</button>
             </form>
         </div>

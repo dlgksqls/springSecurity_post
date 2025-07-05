@@ -3,16 +3,16 @@ package spring.securitystudy.util;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import spring.securitystudy.member.MemberDetails;
-import spring.securitystudy.member.entity.Member;
+import spring.securitystudy.user.UserDetailsImpl;
+import spring.securitystudy.user.entity.User;
 
 @Component
 public class SecurityUtilImpl implements SecurityUtil{
 
     @Override
-    public void reAuthenticate(Member member) {
+    public void reAuthenticate(User member) {
         // 새로운 인증 정보 갱신 (사용자 이름이 바뀌면서,, 인증 정보를 갱신해야함) .. 왠만하면 아이디는 바꾸지 마라
-        MemberDetails memberDetails = new MemberDetails(member);
+        UserDetailsImpl memberDetails = new UserDetailsImpl(member);
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
                         memberDetails,

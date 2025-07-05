@@ -13,14 +13,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
-import spring.securitystudy.member.service.MemberDetailsService;
+import spring.securitystudy.user.service.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final MemberDetailsService memberDetailsService;
+    private final UserDetailsServiceImpl memberDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -28,25 +28,25 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/templates/chat.html").permitAll()
-                        .requestMatchers("/", "/member/login", "/member/register", "/ws-stomp/**").permitAll()
-                        .requestMatchers("/post/create", "/post/update", "/friendship/**", "/member/**").authenticated()
+                        .requestMatchers("/", "/user/login", "/user/register", "/ws-stomp/**").permitAll()
+                        .requestMatchers("/post/create", "/post/update", "/friendship/**", "/user/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(memberDetailsService)
                 .formLogin(form -> form
-                        .loginPage("/member/login")
+                        .loginPage("/user/login")
                         .defaultSuccessUrl("/", true)
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/member/logout")
+                        .logoutUrl("/user/logout")
                         .logoutSuccessUrl("/")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                 )
                 .sessionManagement(session -> session
                         .maximumSessions(1)
-                        .expiredUrl("/member/login")
+                        .expiredUrl("/user/login")
                         .maxSessionsPreventsLogin(false)
                         .sessionRegistry(sessionRegistry())
                 );

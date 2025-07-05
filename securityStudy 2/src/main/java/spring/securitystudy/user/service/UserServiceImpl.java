@@ -1,4 +1,4 @@
-package spring.securitystudy.member.service;
+package spring.securitystudy.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -8,11 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 import spring.securitystudy.friendship.entity.Status;
 import spring.securitystudy.friendship.repository.FriendShipRepository;
 import spring.securitystudy.image.entity.Image;
-import spring.securitystudy.member.dto.MemberProfile;
-import spring.securitystudy.member.dto.MemberRegisterDto;
-import spring.securitystudy.member.dto.MemberUpdateDto;
-import spring.securitystudy.member.entity.Member;
-import spring.securitystudy.member.repository.MemberRepository;
+import spring.securitystudy.user.dto.UserProfile;
+import spring.securitystudy.user.dto.UserRegisterDto;
+import spring.securitystudy.user.dto.UserUpdateDto;
+import spring.securitystudy.user.entity.User;
+import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
 import spring.securitystudy.post.repository.PostRepository;
@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MemberServiceImpl implements MemberService{
+public class UserServiceImpl implements UserService {
 
-    private final MemberRepository memberRepository;
+    private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final FriendShipRepository friendShipRepository;
 
@@ -35,83 +35,83 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     @Transactional
-    public Member register(MemberRegisterDto dto) {
-        if (memberRepository.findByUsername(dto.getUsername()).isPresent()) {
+    public User register(UserRegisterDto dto) {
+        if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 사용자 입니다.");
         }
 
-        Member member = new Member();
-        member.createMember(dto, passwordEncoder);
-        memberRepository.save(member);
+        User user = new User();
+        user.createUser(dto, passwordEncoder);
+        userRepository.save(user);
 
-        return member;
+        return user;
     }
 
     @Override
-    public Member findByUsername(String username){
-        return memberRepository.findByUsername(username)
+    public User findByUsername(String username){
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자를 찾을 수 없습니다."));
     }
 
     @Override
-    public List<Member> findAll(){
-        return memberRepository.findAll();
+    public List<User> findAll(){
+        return userRepository.findAll();
     }
 
     @Override
-    public List<Member> findByUsernamePrefix(String username) {
-        return memberRepository.findByUsernamePrefix(username)
+    public List<User> findByUsernamePrefix(String username) {
+        return userRepository.findByUsernamePrefix(username)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이름을 가진 사용자는 없습니다."));
     }
 
     @Override
     @Transactional
-    public void update(String username, MemberUpdateDto dto) {
-        Member findMember = findByUsername(username);
-        findMember.update(dto);
+    public void update(String username, UserUpdateDto dto) {
+        User findUser = findByUsername(username);
+        findUser.update(dto);
     }
 
     @Override
     @Transactional
-    public Member changeFriendOnly(String username, boolean isFriendOnly){
-        Member loginMember = findByUsername(username);
-        loginMember.changeFriendOnly(isFriendOnly);
+    public User changeFriendOnly(String username, boolean isFriendOnly){
+        User loginUser = findByUsername(username);
+        loginUser.changeFriendOnly(isFriendOnly);
 
-        return loginMember;
+        return loginUser;
     }
 
     @Override
-    public MemberProfile findPostByUsername(String username) {
-        Member findMember = findByUsername(username);
+    public UserProfile findPostByUsername(String username) {
+        User findUser = findByUsername(username);
         List<Post> postByUsername = postRepository.findByUsername(username);
         List<PostViewDto> postDto = new ArrayList<>();
         for (Post post : postByUsername) {
             List<String> imageUrls = post.getImageList().stream().map(Image::getUrl).collect(Collectors.toList());
             postDto.add(new PostViewDto(post, imageUrls, true));
         }
-        return MemberProfile.builder()
+        return UserProfile.builder()
                 .username(username)
-                .role(findMember.getRole())
+                .role(findUser.getRole())
                 .posts(postDto)
                 .build();
     }
 
     @Override
-    public Map<String, String> findFriendShipStatus(Member loginMember, List<Member> findMemberList) {
+    public Map<String, String> findFriendShipStatus(User loginMember, List<User> findMemberList) {
         Map<String, String> findMemberFriendShipList = new HashMap<>();
-        for (Member member : findMemberList) {
-            Status status = friendShipRepository.findStatus(loginMember, member);
+        for (User user : findMemberList) {
+            Status status = friendShipRepository.findStatus(loginMember, user);
 
             if (status != null){
-                findMemberFriendShipList.put(member.getUsername(), status.name());
+                findMemberFriendShipList.put(user.getUsername(), status.name());
             }
-            else findMemberFriendShipList.put(member.getUsername(), null);
+            else findMemberFriendShipList.put(user.getUsername(), null);
         }
 
         return findMemberFriendShipList;
     }
 
     private boolean isUsernameDuplicate(String username) {
-        return memberRepository.findByUsername(username).isPresent();
+        return userRepository.findByUsername(username).isPresent();
     }
 }

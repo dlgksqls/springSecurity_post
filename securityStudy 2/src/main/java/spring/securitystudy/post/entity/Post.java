@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.hibernate.annotations.BatchSize;
 import spring.securitystudy.comment.entity.Comment;
 import spring.securitystudy.image.entity.Image;
-import spring.securitystudy.member.entity.Member;
+import spring.securitystudy.user.entity.User;
 import spring.securitystudy.post.dto.PostCreateDto;
 import spring.securitystudy.post.dto.PostUpdateDto;
 
@@ -26,7 +26,7 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "memberId")
-    private Member member;
+    private User user;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> commentList = new ArrayList<>();
@@ -35,13 +35,13 @@ public class Post {
     @BatchSize(size = 10)
     private List<Image> imageList = new ArrayList<>();
 
-    public static Post create(PostCreateDto dto, Member loginUser) {
+    public static Post create(PostCreateDto dto, User loginUser) {
         Post post = new Post();
         post.title = dto.getTitle();
         post.content = dto.getContent();
         post.createdDate = LocalDate.now();
         post.updatedDate = null;
-        post.member = loginUser;
+        post.user = loginUser;
 
         return post;
     }
@@ -54,20 +54,20 @@ public class Post {
         this.commentList.add(comment);
     }
 
-    public void createFirstPost(Member member) {
+    public void createFirstPost(User user) {
         this.title = "첫 게시글";
         this.content = "안녕하세요";
         this.createdDate = LocalDate.now();
         this.updatedDate = null;
-        this.member = member;
+        this.user = user;
     }
 
-    public void createSecondPost(Member member) {
+    public void createSecondPost(User user) {
         this.title = "두번째 게시글";
         this.content = "안녕하세요";
         this.createdDate = LocalDate.now();
         this.updatedDate = null;
-        this.member = member;
+        this.user = user;
     }
 
     public void addImage(Image image) {

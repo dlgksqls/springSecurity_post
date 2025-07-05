@@ -13,22 +13,22 @@
     </div>
 
     <div th:if="${username == null}" class="auth-section">
-        <p><a href="/member/login">로그인</a></p>
-        <p><a href="/member/register">회원가입</a></p>
+        <p><a href="/user/login">로그인</a></p>
+        <p><a href="/user/register">회원가입</a></p>
     </div>
 
     <div th:if="${username != null}" class="user-section">
         <div class="welcome">
             <p th:text="'환영합니다, ' + ${username} + '님!'"></p>
-            <a th:href="@{member/profile/{username}(username=${username})}">내 정보</a><br>
-            <a href="member/find">사용자 찾기</a>
+            <a th:href="@{user/profile/{username}(username=${username})}">내 정보</a><br>
+            <a href="user/find">사용자 찾기</a>
             <a href="friendship">친구 요청 목록</a>
             <a href="friendship/allFriends">친구 목록</a>
         </div>
 
         <div class="actions">
             <button class="post-button" onclick="location.href='/post/create'">글쓰기</button>
-            <form action="/member/logout" method="post">
+            <form action="/user/logout" method="post">
                 <button type="submit" class="logout-button">로그아웃</button>
             </form>
         </div>

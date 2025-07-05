@@ -1,12 +1,12 @@
-package spring.securitystudy.member.entity;
+package spring.securitystudy.user.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import spring.securitystudy.comment.entity.Comment;
 import spring.securitystudy.friendship.entity.FriendShip;
-import spring.securitystudy.member.dto.MemberRegisterDto;
-import spring.securitystudy.member.dto.MemberUpdateDto;
+import spring.securitystudy.user.dto.UserRegisterDto;
+import spring.securitystudy.user.dto.UserUpdateDto;
 import spring.securitystudy.post.entity.Post;
 
 import java.util.ArrayList;
@@ -14,7 +14,8 @@ import java.util.List;
 
 @Entity
 @Getter
-public class Member {
+@Table(name = "users")
+public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -24,19 +25,19 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "user")
     private List<Post> postList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "user")
     private List<Comment> commentList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "sendMember")
+    @OneToMany(mappedBy = "sendUser")
     private List<FriendShip> sendList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "receiveMember")
+    @OneToMany(mappedBy = "receiveUser")
     private List<FriendShip> reveiveList = new ArrayList<>();
 
-    public void createMember(MemberRegisterDto dto, PasswordEncoder passwordEncoder) {
+    public void createUser(UserRegisterDto dto, PasswordEncoder passwordEncoder) {
         this.username = dto.getUsername();
         this.password = passwordEncoder.encode(dto.getPassword());
         this.role = Role.USER;
@@ -49,13 +50,13 @@ public class Member {
         this.commentList.add(comment);
     }
 
-    public void createFirstMember(PasswordEncoder passwordEncoder) {
+    public void createFirstUser(PasswordEncoder passwordEncoder) {
         this.username = "admin";
         this.password = passwordEncoder.encode("1234");
         this.role = Role.USER;
     }
 
-    public void createSecondMember(PasswordEncoder passwordEncoder) {
+    public void createSecondUser(PasswordEncoder passwordEncoder) {
         this.username = "user";
         this.password = passwordEncoder.encode("1234");
         this.role = Role.USER;
@@ -69,15 +70,15 @@ public class Member {
         this.reveiveList.add(newFriendShip);
     }
 
-    public void removeReceive(Member requestMember) {
+    public void removeReceive(User requestMember) {
         this.reveiveList.removeIf(member -> member.equals(requestMember));
     }
 
-    public void removeRequest(Member loginMember) {
+    public void removeRequest(User loginMember) {
         this.sendList.removeIf(member -> member.equals(loginMember));
     }
 
-    public void update(MemberUpdateDto dto) {
+    public void update(UserUpdateDto dto) {
         this.username = dto.getUsername();
         this.isFriendOnly = dto.isFriendOnly();
     }

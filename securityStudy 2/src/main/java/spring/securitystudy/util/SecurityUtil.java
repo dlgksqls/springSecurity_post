@@ -1,7 +1,7 @@
 package spring.securitystudy.util;
 
-import spring.securitystudy.member.entity.Member;
+import spring.securitystudy.user.entity.User;
 
 public interface SecurityUtil {
-    void reAuthenticate(Member member);
+    void reAuthenticate(User member);
 }

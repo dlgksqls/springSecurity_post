@@ -7,8 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import spring.securitystudy.member.entity.Member;
-import spring.securitystudy.member.service.MemberServiceImpl;
+import spring.securitystudy.user.entity.User;
+import spring.securitystudy.user.service.UserServiceImpl;
 
 import java.security.Principal;
 import java.util.List;
@@ -18,13 +18,13 @@ import java.util.List;
 @RequestMapping("/chat")
 public class ChatController {
 
-    private final MemberServiceImpl memberService;
+    private final UserServiceImpl memberService;
     private final SimpMessagingTemplate messagingTemplate;
 
     @GetMapping("")
     public String viewIndex(Principal principal, Model model) {
         String currentUsername = principal.getName();
-        List<Member> members = memberService.findAll()
+        List<User> members = memberService.findAll()
                 .stream()
                 .filter(member -> !member.getUsername().equals(currentUsername))
                 .toList();

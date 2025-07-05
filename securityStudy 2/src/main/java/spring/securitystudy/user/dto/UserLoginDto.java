@@ -1,9 +1,9 @@
-package spring.securitystudy.member.dto;
+package spring.securitystudy.user.dto;
 
 import lombok.Data;
 
 @Data
-public class MemberRegisterDto {
+public class UserLoginDto {
 
     private String username;
     private String password;

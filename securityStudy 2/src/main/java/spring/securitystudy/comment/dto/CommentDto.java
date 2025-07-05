@@ -18,7 +18,7 @@ public class CommentDto {
     public CommentDto(Comment comment){
         this.id = comment.getId();
         this.content = comment.getContent();
-        this.username = comment.getMember().getUsername();
+        this.username = comment.getUser().getUsername();
         this.createdDate = comment.getCreatedDate();
         this.updatedDate = comment.getUpdateDate();
     }

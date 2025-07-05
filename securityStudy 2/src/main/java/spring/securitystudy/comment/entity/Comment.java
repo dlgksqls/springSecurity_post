@@ -2,7 +2,7 @@ package spring.securitystudy.comment.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import spring.securitystudy.member.entity.Member;
+import spring.securitystudy.user.entity.User;
 import spring.securitystudy.post.entity.Post;
 
 import java.time.LocalDate;
@@ -22,16 +22,16 @@ public class Comment {
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberId")
-    private Member member;
+    @JoinColumn(name = "userId")
+    private User user;
 
-    public void create(Post findPost, String content, Member findMember) {
+    public void create(Post findPost, String content, User findUser) {
         this.content = content;
         this.createdDate = LocalDate.now();
         this.updateDate = null;
 
         this.post = findPost;
-        this.member = findMember;
+        this.user = findUser;
     }
 
     public void update(String content) {

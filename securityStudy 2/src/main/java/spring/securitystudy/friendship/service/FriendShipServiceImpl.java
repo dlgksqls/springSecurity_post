@@ -7,99 +7,112 @@ import spring.securitystudy.friendship.dto.FriendShipReturnDto;
 import spring.securitystudy.friendship.entity.FriendShip;
 import spring.securitystudy.friendship.entity.Status;
 import spring.securitystudy.friendship.repository.FriendShipRepository;
-import spring.securitystudy.member.entity.Member;
-import spring.securitystudy.member.repository.MemberRepository;
+import spring.securitystudy.user.entity.User;
+import spring.securitystudy.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class FriendShipService {
+public class FriendShipServiceImpl implements FriendShipService{
 
     private final FriendShipRepository friendShipRepository;
-    private final MemberRepository memberRepository;
+    private final UserRepository memberRepository;
 
+    @Override
     @Transactional
-    public void add(String loginUser, Member receiveUser) {
-        FriendShip newFriendShip = new FriendShip();
-        Member requestUser = memberRepository.findByUsername(loginUser)
+    public void add(String loginUser, String receiveMemberName) {
+        User receiveMember = memberRepository.findByUsername(receiveMemberName)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
 
-        newFriendShip.save(requestUser, receiveUser);
+        FriendShip newFriendShip = new FriendShip();
+        User requestUser = memberRepository.findByUsername(loginUser)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
+
+        newFriendShip.save(requestUser, receiveMember);
 
         friendShipRepository.save(newFriendShip);
 
         requestUser.requestFriendShip(newFriendShip);
-        receiveUser.receiveFriendShip(newFriendShip);
+        receiveMember.receiveFriendShip(newFriendShip);
     }
 
-
+    @Override
     public List<FriendShipReturnDto> findByUsername(String loginUserName) {
         List<FriendShip> receiveList = friendShipRepository.findReceive(loginUserName, Status.REQUEST);
         return receiveList.stream()
                 .map(friendShip -> new FriendShipReturnDto(
-                        friendShip.getSendMember().getUsername(),
+                        friendShip.getSendUser().getUsername(),
                         friendShip.getStatus()
                         )
                 ).toList();
     }
 
-    public Status isFriendStatus(Member loginMember, Member member) {
+    @Override
+    public Status isFriendStatus(User loginMember, User member) {
         return friendShipRepository.findStatus(loginMember, member);
     }
 
+    @Override
     @Transactional
     public void acceptFriend(String receiveMemberName, String requestMemberName) {
         FriendShip friendShip = findMembersRelation(receiveMemberName, requestMemberName);
 
-        if (friendShip.getStatus() == Status.ACCEPT){
-            friendShip.accept();
+        friendShip.accept();
 
-            removeFriendShipCollection(friendShip);
-        }
+        removeFriendShipCollection(friendShip);
     }
 
+    @Override
     @Transactional
     public void rejectFriend(String receiveMemberName, String requestMemberName) {
-
         FriendShip friendShip = findMembersRelation(receiveMemberName, requestMemberName);
 
-        if (friendShip.getStatus() == Status.BLOCKED){
-            friendShipRepository.delete(friendShip);
+        friendShipRepository.delete(friendShip);
 
-            removeFriendShipCollection(friendShip);
-        }
+        removeFriendShipCollection(friendShip);
     }
 
     private FriendShip findMembersRelation(String receiveMemberName, String requestMemberName) {
-        Member receiveMember = memberRepository.findByUsername(receiveMemberName)
+        User receiveMember = memberRepository.findByUsername(receiveMemberName)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
 
-        Member requestMember = memberRepository.findByUsername(requestMemberName)
+        User requestMember = memberRepository.findByUsername(requestMemberName)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
 
         return friendShipRepository.findByLoginMemberAndRequestMember(receiveMember, requestMember);
     }
 
     private static void removeFriendShipCollection(FriendShip friendShip) {
-        friendShip.getReceiveMember().removeReceive(friendShip.getSendMember());
-        friendShip.getSendMember().removeRequest(friendShip.getReceiveMember());
+        friendShip.getReceiveUser().removeReceive(friendShip.getSendUser());
+        friendShip.getSendUser().removeRequest(friendShip.getReceiveUser());
     }
 
-    public Boolean isFriend(String loginUserName, Member member) {
-        Member loginUser = memberRepository.findByUsername(loginUserName)
+    @Override
+    public Boolean isFriend(String loginUserName, User member) {
+        User loginUser = memberRepository.findByUsername(loginUserName)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
 
         Optional<FriendShip> friendShip = friendShipRepository.findFriendShip(loginUser, member, Status.ACCEPT);
         return friendShip.isPresent();
     }
 
-    public List<String> findFriendShipList(Member loginUser) {
+    @Override
+    public List<String> findFriendShipList(User loginUser) {
         return friendShipRepository.findFriendShipList(loginUser, Status.ACCEPT);
     }
 
-    public List<FriendShip> findAllByUsername(String username) {
-        return friendShipRepository.findAllFriendsByUsername(username);
+    @Override
+    public List<FriendShipReturnDto> findAllByUsername(String username) {
+        List<FriendShip> allFriendShipByUsername = friendShipRepository.findAllFriendsByUsername(username);
+
+        return allFriendShipByUsername.stream()
+                .map(friendShip -> {
+                    String friendUsername = friendShip.getSendUser().getUsername().equals(username)
+                            ? friendShip.getReceiveUser().getUsername()
+                            : friendShip.getSendUser().getUsername();
+                    return new FriendShipReturnDto(friendUsername, Status.ACCEPT);
+                }).toList();
     }
 }

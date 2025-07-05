@@ -13,9 +13,9 @@ import spring.securitystudy.image.dto.ImageUrlsDto;
 import spring.securitystudy.image.entity.Image;
 import spring.securitystudy.image.repository.ImageRepository;
 import spring.securitystudy.image.service.ImageService;
-import spring.securitystudy.member.entity.Member;
-import spring.securitystudy.member.repository.MemberRepository;
-import spring.securitystudy.post.dto.PostCommentDto;
+import spring.securitystudy.user.entity.User;
+import spring.securitystudy.user.repository.UserRepository;
+import spring.securitystudy.post.dto.PostCommentImageDto;
 import spring.securitystudy.post.dto.PostCreateDto;
 import spring.securitystudy.post.dto.PostUpdateDto;
 import spring.securitystudy.post.dto.PostViewDto;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
+    private final UserRepository userRepository;
     private final ImageRepository imageRepository;
 
     private final ImageService imageService;
@@ -40,7 +40,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public void create(PostCreateDto postDto, ImageUploadDto imageDto, String username) {
-        Member loginUser = memberRepository.findByUsername(username)
+        User loginUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
 
         Post newPost = Post.create(postDto, loginUser);
@@ -89,14 +89,14 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostCommentDto findCommentPost(Long id) {
+    public PostCommentImageDto findCommentPost(Long id) {
         Post findPost = findById(id);
         List<CommentDto> postComment = postRepository.findCommentByPostId(id);
         List<ImageUrlsDto> postImage = postRepository.findImageByPostId(id);
 
-        PostCommentDto postCommentDto = new PostCommentDto(findPost, postImage, postComment);
+        PostCommentImageDto postCommentImageDto = new PostCommentImageDto(findPost, postImage, postComment);
 
-        return postCommentDto;
+        return postCommentImageDto;
     }
 
     @Override
