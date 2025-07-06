@@ -13,9 +13,9 @@ import java.util.List;
 public interface PostService {
     /**
      * 게시글 생성
-     * @param postDto post 내용
-     * @param imageDto image url 정보
-     * @param username 사용자 정보
+     * @param postDto (String title, String content)
+     * @param imageDto (List<MultipartFile> files)
+     * @param username
      */
     void create(PostCreateDto postDto, ImageUploadDto imageDto, String username);
 
@@ -37,7 +37,7 @@ public interface PostService {
     /**
      * postUpdate
      * @param id post Id
-     * @param dto 업데이트 내용
+     * @param dto (String title, String content, LocalDate updatedDate)
      */
     void update(Long id, PostUpdateDto dto);
 

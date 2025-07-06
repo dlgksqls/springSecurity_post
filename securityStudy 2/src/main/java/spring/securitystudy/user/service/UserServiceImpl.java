@@ -59,8 +59,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findByUsernamePrefix(String username) {
-        return userRepository.findByUsernamePrefix(username)
+    public List<User> findByUsernamePrefix(String prefix) {
+        return userRepository.findByUsernamePrefix(prefix)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이름을 가진 사용자는 없습니다."));
     }
 

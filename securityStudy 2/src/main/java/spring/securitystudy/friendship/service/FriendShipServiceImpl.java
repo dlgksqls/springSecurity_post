@@ -22,7 +22,7 @@ public class FriendShipServiceImpl implements FriendShipService{
 
     @Override
     @Transactional
-    public void add(String loginUser, String receiveMemberName) {
+    public void request(String loginUser, String receiveMemberName) {
         User receiveMember = memberRepository.findByUsername(receiveMemberName)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
 
@@ -39,8 +39,8 @@ public class FriendShipServiceImpl implements FriendShipService{
     }
 
     @Override
-    public List<FriendShipReturnDto> findByUsername(String loginUserName) {
-        List<FriendShip> receiveList = friendShipRepository.findReceive(loginUserName, Status.REQUEST);
+    public List<FriendShipReturnDto> fineReceiveByUserName(String username) {
+        List<FriendShip> receiveList = friendShipRepository.findReceive(username, Status.REQUEST);
         return receiveList.stream()
                 .map(friendShip -> new FriendShipReturnDto(
                         friendShip.getSendUser().getUsername(),
@@ -94,8 +94,7 @@ public class FriendShipServiceImpl implements FriendShipService{
         User loginUser = memberRepository.findByUsername(loginUserName)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
 
-        Optional<FriendShip> friendShip = friendShipRepository.findFriendShip(loginUser, member, Status.ACCEPT);
-        return friendShip.isPresent();
+        return friendShipRepository.findFriendShip(loginUser, member, Status.ACCEPT).isPresent();
     }
 
     @Override
@@ -104,7 +103,7 @@ public class FriendShipServiceImpl implements FriendShipService{
     }
 
     @Override
-    public List<FriendShipReturnDto> findAllByUsername(String username) {
+    public List<FriendShipReturnDto> findAllFriendsByUsername(String username) {
         List<FriendShip> allFriendShipByUsername = friendShipRepository.findAllFriendsByUsername(username);
 
         return allFriendShipByUsername.stream()

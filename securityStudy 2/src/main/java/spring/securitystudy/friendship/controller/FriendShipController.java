@@ -25,7 +25,7 @@ public class FriendShipController {
 
     @GetMapping("")
     public String receiveFriendView(Principal principal, Model model){
-        List<FriendShipReturnDto> receiveList = friendShipService.findByUsername(principal.getName());
+        List<FriendShipReturnDto> receiveList = friendShipService.fineReceiveByUserName(principal.getName());
 
         model.addAttribute("receiveList", receiveList);
         return "friendship/receive";
@@ -52,14 +52,14 @@ public class FriendShipController {
                                 String receiveUserName,
                                 String param){
 
-        friendShipService.add(memberDetails.getUsername(), receiveUserName);
+        friendShipService.request(memberDetails.getUsername(), receiveUserName);
 
         return "redirect:/member/find?username=" + param;
     }
 
     @GetMapping("/allFriends")
     public String allFriend(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, Model model) {
-        List<FriendShipReturnDto> allFriend = friendShipService.findAllByUsername(userDetailsImpl.getUsername());
+        List<FriendShipReturnDto> allFriend = friendShipService.findAllFriendsByUsername(userDetailsImpl.getUsername());
 
         model.addAttribute("friendList", allFriend);
         return "friendship/allFriend";
