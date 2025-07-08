@@ -11,11 +11,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-@RequiredArgsConstructor
 @Data
-public class UserDetailsImpl implements UserDetails {
+public class CustomUserDetails implements UserDetails {
 
     private final User user;
+
+    public CustomUserDetails(User user) {
+        this.user = user;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -55,8 +58,8 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UserDetailsImpl)) return false;
-        UserDetailsImpl that = (UserDetailsImpl) o;
+        if (!(o instanceof CustomUserDetails)) return false;
+        CustomUserDetails that = (CustomUserDetails) o;
         return Objects.equals(this.getUser().getId(), that.getUser().getId());
     }
 

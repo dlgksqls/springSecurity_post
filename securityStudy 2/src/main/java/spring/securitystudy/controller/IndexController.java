@@ -9,7 +9,7 @@
     import org.springframework.web.bind.annotation.GetMapping;
     import org.springframework.web.bind.annotation.RequestParam;
     import spring.securitystudy.friendship.service.FriendShipServiceImpl;
-    import spring.securitystudy.user.UserDetailsImpl;
+    import spring.securitystudy.user.CustomUserDetails;
     import spring.securitystudy.user.service.UserService;
     import spring.securitystudy.post.dto.PostViewDto;
     import spring.securitystudy.post.service.PostService;
@@ -27,9 +27,9 @@
         @GetMapping("/")
         public String index(Model model,
                             @RequestParam(defaultValue = "0") int page,
-                            @AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {
+                            @AuthenticationPrincipal CustomUserDetails userDetails) {
             if (userDetails != null) {
-                UserDetailsImpl findMember = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                CustomUserDetails findMember = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //                List<PostViewDto> allPost = postService.findAll();
                 Page<PostViewDto> pagePosts = postService.findAllByPage(page, 10);
                 List<String> friendList = friendShipService.findFriendShipList(findMember.getUser());

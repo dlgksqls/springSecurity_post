@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import spring.securitystudy.friendship.dto.FriendShipReturnDto;
 import spring.securitystudy.friendship.service.FriendShipServiceImpl;
-import spring.securitystudy.user.UserDetailsImpl;
+import spring.securitystudy.user.CustomUserDetails;
 
 import java.security.Principal;
 import java.util.List;
@@ -32,7 +32,7 @@ public class FriendShipController {
     }
 
     @PostMapping("")
-    public String handleFriendRequest(@AuthenticationPrincipal UserDetailsImpl memberDetails,
+    public String handleFriendRequest(@AuthenticationPrincipal CustomUserDetails memberDetails,
                                       String requestUsername,
                                       String action) {
 
@@ -48,7 +48,7 @@ public class FriendShipController {
     }
 
     @PostMapping("/request")
-    public String requestFriend(@AuthenticationPrincipal UserDetailsImpl memberDetails,
+    public String requestFriend(@AuthenticationPrincipal CustomUserDetails memberDetails,
                                 String receiveUserName,
                                 String param){
 
@@ -58,8 +58,8 @@ public class FriendShipController {
     }
 
     @GetMapping("/allFriends")
-    public String allFriend(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, Model model) {
-        List<FriendShipReturnDto> allFriend = friendShipService.findAllFriendsByUsername(userDetailsImpl.getUsername());
+    public String allFriend(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+        List<FriendShipReturnDto> allFriend = friendShipService.findAllFriendsByUsername(customUserDetails.getUsername());
 
         model.addAttribute("friendList", allFriend);
         return "friendship/allFriend";

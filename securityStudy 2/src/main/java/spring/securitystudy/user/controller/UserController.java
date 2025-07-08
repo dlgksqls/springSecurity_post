@@ -1,12 +1,13 @@
 package spring.securitystudy.user.controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import spring.securitystudy.user.UserDetailsImpl;
+import spring.securitystudy.user.CustomUserDetails;
 import spring.securitystudy.user.dto.UserProfile;
 import spring.securitystudy.user.dto.UserRegisterDto;
 import spring.securitystudy.user.dto.UserUpdateDto;
@@ -42,8 +43,18 @@ public class UserController {
         return "user/login";
     }
 
+    @GetMapping("/logout")
+    public String logout(HttpServletResponse response){
+        Cookie deleteCookie = new Cookie("Authentication", null);
+        deleteCookie.setMaxAge(0);
+        deleteCookie.setPath("/");
+        response.addCookie(deleteCookie);
+
+        return "redirect:/user/login";
+    }
+
     @GetMapping("/update")
-    public String updateView(@AuthenticationPrincipal UserDetailsImpl findUser,
+    public String updateView(@AuthenticationPrincipal CustomUserDetails findUser,
                              Model model){
 
 //        MemberDetails findMember = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -78,11 +89,11 @@ public class UserController {
         User loginUser = userService.changeFriendOnly(principal.getName(), isFriendOnly);
         securityUtil.reAuthenticate(loginUser);
 
-        return "redirect:/member/profile/" + principal.getName();
+        return "redirect:/user/profile/" + principal.getName();
     }
 
     @GetMapping("/profile/{username}")
-    public String profileView(@AuthenticationPrincipal UserDetailsImpl loginUser,
+    public String profileView(@AuthenticationPrincipal CustomUserDetails loginUser,
                               @PathVariable String username,
                               Model model){
 
@@ -96,7 +107,7 @@ public class UserController {
     }
 
     @GetMapping("/find")
-    public String find(@AuthenticationPrincipal UserDetailsImpl loginUser,
+    public String find(@AuthenticationPrincipal CustomUserDetails loginUser,
                        String username,
                        Model model) {
 

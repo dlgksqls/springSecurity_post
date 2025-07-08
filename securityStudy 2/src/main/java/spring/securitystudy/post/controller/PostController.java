@@ -2,12 +2,11 @@ package spring.securitystudy.post.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import spring.securitystudy.image.dto.ImageUploadDto;
-import spring.securitystudy.user.UserDetailsImpl;
+import spring.securitystudy.user.CustomUserDetails;
 import spring.securitystudy.post.dto.PostCommentImageDto;
 import spring.securitystudy.post.dto.PostCreateDto;
 import spring.securitystudy.post.dto.PostUpdateDto;
@@ -31,7 +30,7 @@ public class PostController {
     }
 
     @PostMapping("/create")
-    public String postCreate(@AuthenticationPrincipal UserDetailsImpl loginUser,
+    public String postCreate(@AuthenticationPrincipal CustomUserDetails loginUser,
                              PostCreateDto postDto,
                              ImageUploadDto imageDto){
         if (loginUser == null){

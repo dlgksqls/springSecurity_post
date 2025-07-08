@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import spring.securitystudy.user.UserDetailsImpl;
+import spring.securitystudy.user.CustomUserDetails;
 import spring.securitystudy.user.entity.User;
 import spring.securitystudy.user.repository.UserRepository;
 
@@ -22,6 +22,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User member = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저는 없습니다."));
 
-        return new UserDetailsImpl(member);
+        return new CustomUserDetails(member);
     }
 }
