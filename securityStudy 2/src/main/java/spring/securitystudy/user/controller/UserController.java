@@ -43,15 +43,15 @@ public class UserController {
         return "user/login";
     }
 
-    @GetMapping("/logout")
-    public String logout(HttpServletResponse response){
-        Cookie deleteCookie = new Cookie("Authentication", null);
-        deleteCookie.setMaxAge(0);
-        deleteCookie.setPath("/");
-        response.addCookie(deleteCookie);
-
-        return "redirect:/user/login";
-    }
+//    @GetMapping("/logout")
+//    public String logout(HttpServletResponse response){
+//        Cookie deleteCookie = new Cookie("Authentication", null);
+//        deleteCookie.setMaxAge(0);
+//        deleteCookie.setPath("/");
+//        response.addCookie(deleteCookie);
+//
+//        return "redirect:/user/login";
+//    }
 
     @GetMapping("/update")
     public String updateView(@AuthenticationPrincipal CustomUserDetails findUser,

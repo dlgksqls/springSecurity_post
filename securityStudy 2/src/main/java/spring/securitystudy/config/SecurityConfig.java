@@ -1,6 +1,7 @@
 package spring.securitystudy.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -32,7 +34,7 @@ public class SecurityConfig {
 
     private final UserDetailsServiceImpl memberDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
-    private final UserRepository userRepository;
+    private final UserDetailsService userDetailsService;
     private final JWTUtil jwtUtil;
 
     @Bean
@@ -58,12 +60,11 @@ public class SecurityConfig {
 //                        .defaultSuccessUrl("/", true)
 //                        .permitAll()
 //                )
-//                .logout(logout -> logout
-//                        .logoutUrl("/user/logout")
-//                        .logoutSuccessUrl("/")
-//                        .invalidateHttpSession(true)
-//                        .deleteCookies("JSESSIONID")
-//                )
+                .logout(logout -> logout
+                        .logoutUrl("/user/logout")
+                        .logoutSuccessUrl("/")
+                        .deleteCookies("Authentication")
+                )
 //                .sessionManagement(session -> session
 //                        .maximumSessions(1)
 //                        .expiredUrl("/user/login")
@@ -71,7 +72,7 @@ public class SecurityConfig {
 //                        .sessionRegistry(sessionRegistry())
 //
 //                )
-                .addFilterBefore(new JWTFilter(jwtUtil, userRepository), LoginFilter.class)
+                .addFilterBefore(new JWTFilter(jwtUtil, userDetailsService), LoginFilter.class)
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

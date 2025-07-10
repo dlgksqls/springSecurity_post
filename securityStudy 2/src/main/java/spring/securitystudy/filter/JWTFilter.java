@@ -7,15 +7,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import spring.securitystudy.user.CustomUserDetails;
-import spring.securitystudy.user.dto.UserRegisterDto;
-import spring.securitystudy.user.entity.User;
-import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.util.JWTUtil;
 
 import java.io.IOException;
@@ -24,39 +21,91 @@ import java.io.IOException;
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
-    private final UserRepository userRepository;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String token = null;
+        String accessToken = null;
+        String refreshToken = null;
 
         Cookie[] cookies = request.getCookies();
-        if (cookies != null){
+        if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("Authentication".equals(cookie.getName())){
-                    token = cookie.getValue();
+                if ("Authentication".equals(cookie.getName())) {
+                    accessToken = cookie.getValue();
+                } else if ("RefreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
                 }
             }
         }
 
-        if (token != null && !jwtUtil.isExpired(token)){
-            String username = jwtUtil.getUsername(token);
-            String role = jwtUtil.getRole(token);
-
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not Found"));
-
-            CustomUserDetails userDetails = new CustomUserDetails(user);
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(userDetails,
-                            null, userDetails.getAuthorities());
-
-            SecurityContextHolder.getContext().setAuthentication(auth);
+        // 1. Access Token 이 없는 경우
+        if (accessToken == null){
+            filterChain.doFilter(request, response);
+            return;
         }
 
+        // 2. Access Token 이 만료된 경우
+        if (jwtUtil.isExpired(accessToken)) {
+            // 2-1. Refresh Token 이 있는지 확인
+            if (refreshToken == null){
+                // 없으면 재로그인 필요
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            // 2-2. Refresh Token 이 유효한지 확인
+            if (jwtUtil.isExpired(refreshToken)){
+                // Refresh Token 도 만료면 재로그인 필요
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            logger.debug("토큰 갱신");
+            String usernameFromRefreshToken = jwtUtil.getUsername(refreshToken);
+            CustomUserDetails userDetails;
+            try {
+                userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(usernameFromRefreshToken);
+            } catch (UsernameNotFoundException e){
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            String newAccessToken = jwtUtil.createAccessToken(
+                    userDetails.getUsername(),
+                    userDetails.getAuthorities().iterator().next().getAuthority()
+            );
+
+            Cookie accessTokenCookie = new Cookie("Authentication", newAccessToken);
+            accessTokenCookie.setHttpOnly(true);
+            accessTokenCookie.setSecure(false); // HTTPS 사용 시 true로 설정하기
+            accessTokenCookie.setPath("/");
+            accessTokenCookie.setMaxAge(jwtUtil.getRefreshTokenExpiration()); // 15분
+
+            Authentication auth =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String username = jwtUtil.getUsername(accessToken);
+
+        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
+        Authentication auth =
+                new UsernamePasswordAuthenticationToken(userDetails,
+                        null, userDetails.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
         filterChain.doFilter(request, response);
+        return;
     }
 }

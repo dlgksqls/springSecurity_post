@@ -1,3 +1,9 @@
+<div th:if="${param.error}" style="color: red;">
+    <p>로그인 실패!</p>
+    <p th:if="${param.message}" th:text="${param.message}"></p>
+    <p th:unless="${param.message}">아이디 또는 비밀번호를 확인해주세요.</p>
+</div>
+
 <form method="post" action="/user/login">
     <input type="text" name="username" placeholder="ID">
     <input type="text" name="password" placeholder="PASSWORD">

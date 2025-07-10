@@ -5,7 +5,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,12 +26,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
         super();
         this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
-    }
-
-    public LoginFilter(AuthenticationManager authenticationManager, AuthenticationManager authenticationManager1, JWTUtil jwtUtil) {
-        super(authenticationManager);
-        this.authenticationManager = authenticationManager1;
         this.jwtUtil = jwtUtil;
     }
 
@@ -63,16 +56,28 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String role = authority.getAuthority();
 
-        String token = jwtUtil.createdJwt(username, role, 15 * 60 * 1000L); // 15분
+        // 1. Access Token 생성
+        String token = jwtUtil.createAccessToken(username, role); // 15분
 
-        // 쿠키 설정
-        Cookie jwtCookie = new Cookie("Authentication", token);
-        jwtCookie.setHttpOnly(true);
-        jwtCookie.setSecure(false); // HTTPS 사용 시 true로 설정하기
-        jwtCookie.setPath("/");
-        jwtCookie.setMaxAge(15 * 60); // 15분
+        // 2. Refresh Token 상셩
+        String refreshToken = jwtUtil.createRefreshToken(username, role); // 15분
 
-        response.addCookie(jwtCookie);
+        // Access Token 쿠키 설정
+        Cookie accessTokenCookie = new Cookie("Authentication", token);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(false); // HTTPS 사용 시 true로 설정하기
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(jwtUtil.getRefreshTokenExpiration());
+
+        // Refresh Token 쿠키 설정 (새롭게 추가)
+        Cookie refreshTokenCookie = new Cookie("RefreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(jwtUtil.getRefreshTokenExpiration());
+
+        response.addCookie(accessTokenCookie);
+        response.addCookie(refreshTokenCookie);
 
         // 로그인 성공 후 리다이렉트
         response.sendRedirect("/");
@@ -84,8 +89,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                                               AuthenticationException failed)
             throws IOException, ServletException {
 
-        // TODO : 로그인 창으로 보내기, 근데 이건 securityConfig 에서 설정했는가??
-        response.setStatus(401);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
+
+        // 로그인 창으로 리다이렉트
+        String redirectUrl = request.getContextPath() + "/user/login?error";
+
+        response.sendRedirect(redirectUrl);
     }
 
     @Override
