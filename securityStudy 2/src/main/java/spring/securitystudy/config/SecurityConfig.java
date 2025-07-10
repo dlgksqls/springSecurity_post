@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/css/**", "/js/**", "/images/**", "/webjars/**", "/templates/chat.html",
-                                "/", "/user/register", "/ws-stomp/**", "/user/login"
+                                "/", "/user/register", "/ws-stomp/**", "/user/login", "/favicon.io"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -63,7 +63,7 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/user/logout")
                         .logoutSuccessUrl("/")
-                        .deleteCookies("Authentication")
+                        .deleteCookies("Authentication", "RefreshToken")
                 )
 //                .sessionManagement(session -> session
 //                        .maximumSessions(1)

@@ -60,14 +60,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String token = jwtUtil.createAccessToken(username, role); // 15분
 
         // 2. Refresh Token 상셩
-        String refreshToken = jwtUtil.createRefreshToken(username, role); // 15분
+        String refreshToken = jwtUtil.createRefreshToken(username); // 2주
 
         // Access Token 쿠키 설정
         Cookie accessTokenCookie = new Cookie("Authentication", token);
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setSecure(false); // HTTPS 사용 시 true로 설정하기
         accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(jwtUtil.getRefreshTokenExpiration());
+        accessTokenCookie.setMaxAge(jwtUtil.getAccessTokenExpiration() + 60);
 
         // Refresh Token 쿠키 설정 (새롭게 추가)
         Cookie refreshTokenCookie = new Cookie("RefreshToken", refreshToken);

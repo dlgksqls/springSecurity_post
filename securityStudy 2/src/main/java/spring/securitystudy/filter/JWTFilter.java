@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -50,18 +51,10 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // 2. Access Token 이 만료된 경우
         if (jwtUtil.isExpired(accessToken)) {
-            // 2-1. Refresh Token 이 있는지 확인
-            if (refreshToken == null){
+            // 2-1. Refresh Token 이 있는지 확인, Refresh Token 이 유효한지 확인
+            if (refreshToken == null || jwtUtil.isExpired(refreshToken)){
                 // 없으면 재로그인 필요
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            // 2-2. Refresh Token 이 유효한지 확인
-            if (jwtUtil.isExpired(refreshToken)){
-                // Refresh Token 도 만료면 재로그인 필요
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -69,6 +62,7 @@ public class JWTFilter extends OncePerRequestFilter {
             logger.debug("토큰 갱신");
             String usernameFromRefreshToken = jwtUtil.getUsername(refreshToken);
             CustomUserDetails userDetails;
+
             try {
                 userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(usernameFromRefreshToken);
             } catch (UsernameNotFoundException e){
@@ -86,26 +80,37 @@ public class JWTFilter extends OncePerRequestFilter {
             accessTokenCookie.setHttpOnly(true);
             accessTokenCookie.setSecure(false); // HTTPS 사용 시 true로 설정하기
             accessTokenCookie.setPath("/");
-            accessTokenCookie.setMaxAge(jwtUtil.getRefreshTokenExpiration()); // 15분
+            accessTokenCookie.setMaxAge(jwtUtil.getAccessTokenExpiration() + 60);
+
+            response.addCookie(accessTokenCookie);
 
             Authentication auth =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            filterChain.doFilter(request, response);
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(auth);
+            SecurityContextHolder.setContext(context);
+
+            response.sendRedirect(request.getRequestURI());
             return;
         }
 
         String username = jwtUtil.getUsername(accessToken);
 
-        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
-        Authentication auth =
-                new UsernamePasswordAuthenticationToken(userDetails,
-                        null, userDetails.getAuthorities());
+        try {
+            CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
+            Authentication auth =
+                    new UsernamePasswordAuthenticationToken(userDetails,
+                            null, userDetails.getAuthorities());
 
-        SecurityContextHolder.getContext().setAuthentication(auth);
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(auth);
+            SecurityContextHolder.setContext(context);
+        } catch (UsernameNotFoundException e){
+            // 유저 정보 없음 -> 인증 안함
+            SecurityContextHolder.clearContext();
+        }
 
         filterChain.doFilter(request, response);
-        return;
     }
 }

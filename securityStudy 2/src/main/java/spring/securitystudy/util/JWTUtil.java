@@ -3,6 +3,7 @@ package spring.securitystudy.util;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -20,8 +21,7 @@ public class JWTUtil {
     public JWTUtil(@Value("${spring.jwt.secret}") String secret,
                    @Value("${jwt.access-token-expiration}") int accessTokenExpiration,
                    @Value("${jwt.refresh-token-expiration}") int refreshTokenExpiration) {
-        this.secretKey =
-                new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.accessTokenExpiration = accessTokenExpiration;
         this.refreshTokenExpiration = refreshTokenExpiration;
     }
@@ -42,10 +42,12 @@ public class JWTUtil {
 
     public boolean isExpired(String token){
         try {
-            return Jwts
+            Date expiration = Jwts
                     .parser()
                     .verifyWith(secretKey).build()
-                    .parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+                    .parseSignedClaims(token).getPayload().getExpiration();
+
+            return expiration.before(new Date(System.currentTimeMillis() + 1000L));
         } catch (ExpiredJwtException e){
             // 토큰 만료 시
             return true;
@@ -64,10 +66,9 @@ public class JWTUtil {
                 .compact();
     }
 
-    public String createRefreshToken(String username, String role){
+    public String createRefreshToken(String username){
         return Jwts.builder()
                 .claim("username", username)
-                .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + (long)refreshTokenExpiration * 1000L))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
