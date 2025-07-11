@@ -23,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import spring.securitystudy.filter.JWTFilter;
 import spring.securitystudy.filter.LoginFilter;
+import spring.securitystudy.user.repository.RefreshTokenRepository;
 import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.user.service.UserDetailsServiceImpl;
 import spring.securitystudy.util.JWTUtil;
@@ -35,11 +36,12 @@ public class SecurityConfig {
     private final UserDetailsServiceImpl memberDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final UserDetailsService userDetailsService;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final JWTUtil jwtUtil;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil);
+        LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenRepository);
         loginFilter.setFilterProcessesUrl("/user/login");
 
         http

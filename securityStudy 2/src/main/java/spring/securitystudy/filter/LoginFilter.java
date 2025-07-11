@@ -12,9 +12,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import spring.securitystudy.user.CustomUserDetails;
+import spring.securitystudy.user.repository.RefreshTokenRepository;
 import spring.securitystudy.util.JWTUtil;
+import spring.securitystudy.util.RefreshToken;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -22,11 +25,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
+    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository) {
         super();
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     @Override
@@ -61,6 +66,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         // 2. Refresh Token 상셩
         String refreshToken = jwtUtil.createRefreshToken(username); // 2주
+        RefreshToken redis = new RefreshToken(username, refreshToken);
+        refreshTokenRepository.save(redis);
 
         // Access Token 쿠키 설정
         Cookie accessTokenCookie = new Cookie("Authentication", token);
@@ -93,7 +100,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         // 로그인 창으로 리다이렉트
         String redirectUrl = request.getContextPath() + "/user/login?error";
-
         response.sendRedirect(redirectUrl);
     }
 

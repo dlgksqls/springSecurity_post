@@ -12,6 +12,7 @@ import spring.securitystudy.user.dto.UserProfile;
 import spring.securitystudy.user.dto.UserRegisterDto;
 import spring.securitystudy.user.dto.UserUpdateDto;
 import spring.securitystudy.user.entity.User;
+import spring.securitystudy.user.exception.UserAlreadyExistsException;
 import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
@@ -37,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User register(UserRegisterDto dto) {
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 사용자 입니다.");
+            throw new UserAlreadyExistsException("해당 이름을 가진 유저는 이미 존재합니다.");
         }
 
         User user = new User();
@@ -50,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByUsername(String username){
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UsernameNotFoundException("해당 이름을 가진 사용자는 없습니다."));
     }
 
     @Override
@@ -61,7 +62,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> findByUsernamePrefix(String prefix) {
         return userRepository.findByUsernamePrefix(prefix)
-                .orElseThrow(() -> new IllegalArgumentException("해당 이름을 가진 사용자는 없습니다."));
+                .orElseThrow(() -> new UsernameNotFoundException("해당 이름을 가진 사용자는 없습니다."));
     }
 
     @Override
