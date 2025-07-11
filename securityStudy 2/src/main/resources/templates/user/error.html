@@ -1,0 +1,12 @@
+<html xmlns:th="http://www.thymeleaf.org">
+    <h2>예외가 발생했습니다. 예외는 : <h2 style="color: red;" th:text="${errorMsg}"></h2></h2>
+
+    <div th:if="${authenticated}">
+        <a href="/">처음으로</a>
+    </div>
+    <div th:if="!${authenticated}">
+        <a href="/user/register">회원가입</a><br>
+        <a href="/user/login">로그인</a>
+    </div>
+    </div>
+</html>
