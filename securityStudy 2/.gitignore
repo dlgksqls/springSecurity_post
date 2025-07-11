@@ -8,6 +8,8 @@ build/
 # application.properties 파일 무시
 src/main/resources/application.properties
 
+# 이미지 파일 무시
+/image/
 ### STS ###
 .apt_generated
 .classpath
