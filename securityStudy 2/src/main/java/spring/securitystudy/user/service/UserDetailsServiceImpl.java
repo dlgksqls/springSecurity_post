@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import spring.securitystudy.exception.user.UserNotFoundException;
 import spring.securitystudy.user.CustomUserDetails;
 import spring.securitystudy.user.entity.User;
 import spring.securitystudy.user.repository.UserRepository;
@@ -20,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User member = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 유저는 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException("해당 유저는 없습니다."));
 
         return new CustomUserDetails(member);
     }

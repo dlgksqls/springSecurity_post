@@ -6,9 +6,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import spring.securitystudy.exception.user.TokenExpiredException;
 
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
@@ -40,19 +40,19 @@ public class JWTUtil {
                 .parseSignedClaims(token).getPayload().get("role", String.class);
     }
 
-    public boolean isExpired(String token){
+    public void validateToken(String token){
         try {
             Date expiration = Jwts
                     .parser()
                     .verifyWith(secretKey).build()
                     .parseSignedClaims(token).getPayload().getExpiration();
 
-            return expiration.before(new Date(System.currentTimeMillis() + 1000L));
-        } catch (ExpiredJwtException e){
             // 토큰 만료 시
-            return true;
+            if (expiration.before(new Date())) throw new TokenExpiredException("세션이 만료되었습니다. 다시 로그인하세요.");
+        } catch (ExpiredJwtException e){
+            throw new TokenExpiredException("세션이 만료되었습니다. 다시 로그인하세요.");
         } catch (Exception e){
-            return true;
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
         }
     }
 

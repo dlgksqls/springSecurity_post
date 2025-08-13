@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import spring.securitystudy.exception.user.UserNotFoundException;
 import spring.securitystudy.friendship.entity.Status;
 import spring.securitystudy.friendship.repository.FriendShipRepository;
 import spring.securitystudy.image.entity.Image;
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByUsername(String username){
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 이름을 가진 사용자는 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException("해당 사용자는 없습니다."));
     }
 
     @Override
@@ -62,7 +63,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> findByUsernamePrefix(String prefix) {
         return userRepository.findByUsernamePrefix(prefix)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 이름을 가진 사용자는 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException("해당 사용자는 없습니다."));
     }
 
     @Override
