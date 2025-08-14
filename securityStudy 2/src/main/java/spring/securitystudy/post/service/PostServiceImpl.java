@@ -8,11 +8,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import spring.securitystudy.comment.dto.CommentDto;
+import spring.securitystudy.exception.user.UserNotFoundException;
 import spring.securitystudy.image.dto.ImageUploadDto;
 import spring.securitystudy.image.dto.ImageUrlsDto;
 import spring.securitystudy.image.entity.Image;
 import spring.securitystudy.image.repository.ImageRepository;
 import spring.securitystudy.image.service.ImageService;
+import spring.securitystudy.post.exception.PostNotFoundException;
 import spring.securitystudy.user.entity.User;
 import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.post.dto.PostCommentImageDto;
@@ -41,7 +43,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void create(PostCreateDto postDto, ImageUploadDto imageDto, String username) {
         User loginUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException("해당 사용자를 찾을 수 없습니다."));
 
         Post newPost = Post.create(postDto, loginUser);
         imageService.uploadImage(imageDto, newPost);
@@ -72,17 +74,15 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post findById(Long id) {
-        Post findPost = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시물은 없습니다."));
-
-        return findPost;
+        return postRepository.findById(id)
+                .orElseThrow(() -> new PostNotFoundException("해당 게시물은 없습니다."));
     }
 
     @Override
     @Transactional
     public void update(Long id, PostUpdateDto dto) {
         Post findPost = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시물은 없습니다."));
+                .orElseThrow(() -> new PostNotFoundException("해당 게시물은 없습니다."));
 
 
         findPost.updateContent(dto);
@@ -94,9 +94,7 @@ public class PostServiceImpl implements PostService {
         List<CommentDto> postComment = postRepository.findCommentByPostId(id);
         List<ImageUrlsDto> postImage = postRepository.findImageByPostId(id);
 
-        PostCommentImageDto postCommentImageDto = new PostCommentImageDto(findPost, postImage, postComment);
-
-        return postCommentImageDto;
+        return new PostCommentImageDto(findPost, postImage, postComment);
     }
 
     @Override
