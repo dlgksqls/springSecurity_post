@@ -27,6 +27,11 @@ public class UserController {
     private final UserService userService;
     private final SecurityUtil securityUtil;
 
+    @GetMapping("/error")
+    public String error(){
+        return "user/error";
+    }
+
     @GetMapping("/register")
     public String registerView(){
         return "user/register";

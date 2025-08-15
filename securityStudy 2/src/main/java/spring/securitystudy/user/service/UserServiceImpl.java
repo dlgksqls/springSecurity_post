@@ -1,11 +1,9 @@
 package spring.securitystudy.user.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import spring.securitystudy.exception.user.UserNotFoundException;
 import spring.securitystudy.friendship.entity.Status;
 import spring.securitystudy.friendship.repository.FriendShipRepository;
 import spring.securitystudy.image.entity.Image;
@@ -14,6 +12,7 @@ import spring.securitystudy.user.dto.UserRegisterDto;
 import spring.securitystudy.user.dto.UserUpdateDto;
 import spring.securitystudy.user.entity.User;
 import spring.securitystudy.user.exception.UserAlreadyExistsException;
+import spring.securitystudy.user.exception.UserNotFoundException;
 import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;

@@ -25,7 +25,7 @@ public class FriendShipController {
 
     @GetMapping("")
     public String receiveFriendView(Principal principal, Model model){
-        List<FriendShipReturnDto> receiveList = friendShipService.fineReceiveByUserName(principal.getName());
+        List<FriendShipReturnDto> receiveList = friendShipService.findReceiveByUserName(principal.getName());
 
         model.addAttribute("receiveList", receiveList);
         return "friendship/receive";

@@ -8,8 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
-import spring.securitystudy.exception.user.TokenExpiredException;
 import spring.securitystudy.user.CustomUserDetails;
+import spring.securitystudy.user.exception.TokenExpiredException;
 import spring.securitystudy.util.JWTUtil;
 
 @Controller

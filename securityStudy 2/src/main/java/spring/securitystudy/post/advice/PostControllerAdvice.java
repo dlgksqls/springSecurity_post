@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import spring.securitystudy.post.exception.PostDeniedException;
 import spring.securitystudy.post.exception.PostNotFoundException;
-import spring.securitystudy.post.exception.UserNotAuthenticatedException;
+import spring.securitystudy.user.exception.UserNotAuthenticatedException;
 
 @ControllerAdvice(basePackages = "spring.securitystudy.post.controller")
 public class PostControllerAdvice {

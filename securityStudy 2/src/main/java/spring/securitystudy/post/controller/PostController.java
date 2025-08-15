@@ -8,13 +8,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import spring.securitystudy.image.dto.ImageUploadDto;
 import spring.securitystudy.post.exception.PostDeniedException;
-import spring.securitystudy.post.exception.UserNotAuthenticatedException;
 import spring.securitystudy.user.CustomUserDetails;
 import spring.securitystudy.post.dto.PostCommentImageDto;
 import spring.securitystudy.post.dto.PostCreateDto;
 import spring.securitystudy.post.dto.PostUpdateDto;
 import spring.securitystudy.post.entity.Post;
 import spring.securitystudy.post.service.PostServiceImpl;
+import spring.securitystudy.user.exception.UserNotAuthenticatedException;
 
 import java.nio.file.AccessDeniedException;
 import java.security.Principal;

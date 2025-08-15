@@ -12,11 +12,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
-import spring.securitystudy.exception.user.TokenExpiredException;
-import spring.securitystudy.exception.user.UserNotFoundException;
-import spring.securitystudy.user.CustomUserDetails;
+import spring.securitystudy.user.exception.TokenExpiredException;
 import spring.securitystudy.util.JWTUtil;
 
 import java.io.IOException;

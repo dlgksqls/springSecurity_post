@@ -6,9 +6,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import spring.securitystudy.exception.user.UserNotFoundException;
 import spring.securitystudy.user.CustomUserDetails;
 import spring.securitystudy.user.entity.User;
+import spring.securitystudy.user.exception.UserNotFoundException;
 import spring.securitystudy.user.repository.UserRepository;
 
 @Service

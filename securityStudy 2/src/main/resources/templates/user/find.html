@@ -1,5 +1,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
+
+<div th:if="${param.message}" style="color: red;">
+    <p>해당 유저는 없습니다.</p>
+    <p th:if="${param.message}" th:text="${param.message}"></p>
+    <p th:unless="${param.message}">아이디 또는 비밀번호를 확인해주세요.</p>
+</div>
 <div>
     <form method="get" action="/user/find">
         <input type="text" name="username" placeholder="이름 입력">

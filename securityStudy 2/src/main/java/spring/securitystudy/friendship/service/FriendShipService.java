@@ -19,7 +19,7 @@ public interface FriendShipService {
      * @param username
      * @return
      */
-    List<FriendShipReturnDto> fineReceiveByUserName(String username);
+    List<FriendShipReturnDto> findReceiveByUserName(String username);
 
     /**
      * 사용자와 친구인 멤버를 list로 반환

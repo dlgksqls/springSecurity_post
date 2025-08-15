@@ -6,12 +6,14 @@ import org.springframework.transaction.annotation.Transactional;
 import spring.securitystudy.friendship.dto.FriendShipReturnDto;
 import spring.securitystudy.friendship.entity.FriendShip;
 import spring.securitystudy.friendship.entity.Status;
+import spring.securitystudy.friendship.exception.HandleUserNotExistException;
+import spring.securitystudy.friendship.exception.ReceiveUserNotFoundException;
 import spring.securitystudy.friendship.repository.FriendShipRepository;
 import spring.securitystudy.user.entity.User;
+import spring.securitystudy.user.exception.UserNotFoundException;
 import spring.securitystudy.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,11 +26,11 @@ public class FriendShipServiceImpl implements FriendShipService{
     @Transactional
     public void request(String loginUser, String receiveMemberName) {
         User receiveMember = memberRepository.findByUsername(receiveMemberName)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
+                .orElseThrow(() -> new ReceiveUserNotFoundException("해당 유저는 없습니다."));
 
         FriendShip newFriendShip = new FriendShip();
         User requestUser = memberRepository.findByUsername(loginUser)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException("해당 유저는 없습니다."));
 
         newFriendShip.save(requestUser, receiveMember);
 
@@ -39,7 +41,7 @@ public class FriendShipServiceImpl implements FriendShipService{
     }
 
     @Override
-    public List<FriendShipReturnDto> fineReceiveByUserName(String username) {
+    public List<FriendShipReturnDto> findReceiveByUserName(String username) {
         List<FriendShip> receiveList = friendShipRepository.findReceive(username, Status.REQUEST);
         return receiveList.stream()
                 .map(friendShip -> new FriendShipReturnDto(
@@ -76,10 +78,10 @@ public class FriendShipServiceImpl implements FriendShipService{
 
     private FriendShip findMembersRelation(String receiveMemberName, String requestMemberName) {
         User receiveMember = memberRepository.findByUsername(receiveMemberName)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
+                .orElseThrow(() -> new HandleUserNotExistException("해당 유저는 없습니다."));
 
         User requestMember = memberRepository.findByUsername(requestMemberName)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
+                .orElseThrow(() -> new HandleUserNotExistException("해당 유저는 없습니다."));
 
         return friendShipRepository.findByLoginMemberAndRequestMember(receiveMember, requestMember);
     }
@@ -92,7 +94,7 @@ public class FriendShipServiceImpl implements FriendShipService{
     @Override
     public Boolean isFriend(String loginUserName, User member) {
         User loginUser = memberRepository.findByUsername(loginUserName)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException("해당 유저는 없습니다."));
 
         return friendShipRepository.findFriendShip(loginUser, member, Status.ACCEPT).isPresent();
     }
