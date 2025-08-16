@@ -11,20 +11,20 @@ import spring.securitystudy.user.exception.UserNotAuthenticatedException;
 public class PostControllerAdvice {
 
     @ExceptionHandler(PostDeniedException.class)
-    public String PostDeniedException(PostDeniedException ex, RedirectAttributes redirectAttributes){
+    public String PostDeniedException(RuntimeException ex, RedirectAttributes redirectAttributes){
         redirectAttributes.addAttribute("errorMessage", ex.getMessage());
         return "redirect:/";
     }
 
     @ExceptionHandler(PostNotFoundException.class)
-    public String PostNotFoundException(PostNotFoundException ex, RedirectAttributes redirectAttributes){
+    public String PostNotFoundException(RuntimeException ex, RedirectAttributes redirectAttributes){
         redirectAttributes.addAttribute("errorMessage", ex.getMessage());
         return "redirect:/";
     }
 
     @ExceptionHandler(UserNotAuthenticatedException.class)
-    public String UserNotAuthenticatedException(UserNotAuthenticatedException ex, RedirectAttributes redirectAttributes){
+    public String UserNotAuthenticatedException(RuntimeException ex, RedirectAttributes redirectAttributes){
         redirectAttributes.addAttribute("errorMessage", ex.getMessage());
-        return "redirect:/login.html";
+        return "redirect:/user/login";
     }
 }

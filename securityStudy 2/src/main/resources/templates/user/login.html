@@ -1,11 +1,13 @@
-<div th:if="${param.error}" style="color: red;">
-    <p>로그인 실패!</p>
-    <p th:if="${param.message}" th:text="${param.message}"></p>
-    <p th:unless="${param.message}">아이디 또는 비밀번호를 확인해주세요.</p>
-</div>
+<html xmlns:th="http://www.thymeleaf.org">
 
-<form method="post" action="/user/login">
-    <input type="text" name="username" placeholder="ID">
-    <input type="text" name="password" placeholder="PASSWORD">
-    <button type="submit">로그인</button>
-</form>
+    <div th:if="${param.error}" style="color: red">
+        <p th:text="${param.message}" style="color: red"></p>
+    </div>
+
+    <form method="post" action="/user/login">
+        <input type="text" name="username" placeholder="ID">
+        <input type="text" name="password" placeholder="PASSWORD">
+        <button type="submit">로그인</button>
+    </form>
+
+</html>

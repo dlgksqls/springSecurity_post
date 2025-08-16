@@ -64,7 +64,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // 1. Access Token 생성
         String token = jwtUtil.createAccessToken(username, role); // 15분
 
-        // 2. Refresh Token 상셩
+        // 2. Refresh Token 생셩
         String refreshToken = jwtUtil.createRefreshToken(username); // 2주
         RefreshToken redis = new RefreshToken(username, refreshToken);
         refreshTokenRepository.save(redis);
@@ -81,7 +81,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(false);
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(jwtUtil.getRefreshTokenExpiration());
+        refreshTokenCookie.setMaxAge(jwtUtil.getRefreshTokenExpiration() * 60);
 
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
@@ -99,8 +99,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
 
         // 로그인 창으로 리다이렉트
-        String redirectUrl = request.getContextPath() + "/user/login?error";
-        response.sendRedirect(redirectUrl);
+        response.sendRedirect(request.getContextPath() + "/user/login?error=true&message=Check Your Id Or Password");
+
     }
 
     @Override

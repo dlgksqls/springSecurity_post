@@ -1,7 +1,7 @@
 package spring.securitystudy.post.controller;
 
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,11 +14,13 @@ import spring.securitystudy.post.dto.PostCreateDto;
 import spring.securitystudy.post.dto.PostUpdateDto;
 import spring.securitystudy.post.entity.Post;
 import spring.securitystudy.post.service.PostServiceImpl;
+import spring.securitystudy.user.exception.TokenExpiredException;
 import spring.securitystudy.user.exception.UserNotAuthenticatedException;
+import spring.securitystudy.util.JWTUtil;
+import spring.securitystudy.util.SecurityUtil;
 
 import java.nio.file.AccessDeniedException;
 import java.security.Principal;
-import java.util.NoSuchElementException;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class PostController {
     private final PostServiceImpl postService;
 
     @GetMapping("/create")
-    public String postCreateView(){
+    public String postCreateView(@AuthenticationPrincipal CustomUserDetails loginUser){
         return "post/create";
     }
 
@@ -46,6 +48,7 @@ public class PostController {
 
     @GetMapping("/detail/{id}")
     public String postDetailView(@PathVariable Long id, Principal principal, Model model){
+
         PostCommentImageDto postCommentList = postService.findCommentPost(id);
 
         model.addAttribute("postComment", postCommentList);
@@ -54,7 +57,8 @@ public class PostController {
     }
 
     @GetMapping("/update/{id}")
-    public String postUpdateView(@PathVariable Long id, Principal principal, Model model) throws AccessDeniedException {
+    public String postUpdateView(@PathVariable Long id, Principal principal, Model model) {
+
         Post findPost = postService.findById(id);
 
         if (!findPost.getUser().getUsername().equals(principal.getName())) {
@@ -68,6 +72,7 @@ public class PostController {
 
     @PostMapping("/update")
     public String updatePost(@RequestParam Long id, PostUpdateDto dto) {
+
         postService.update(id, dto);
         return "redirect:/";
     }

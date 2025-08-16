@@ -40,14 +40,11 @@ public class UserController {
     @PostMapping("/register")
     public String register(UserRegisterDto dto){
         userService.register(dto);
-        return "redirect:user/login";
+        return "redirect:/user/login"; // / 붙여주기 맨 앞에
     }
 
     @GetMapping("/login")
-    public String loginView(@RequestParam(value = "error", required = false) String error, Model model){
-        if (error != null){
-            model.addAttribute("errorMessage", "아이디 또는 비밀번호가 일치하지 않습니다.");
-        }
+    public String loginView(){
         return "user/login";
     }
 
@@ -118,6 +115,10 @@ public class UserController {
     public String find(@AuthenticationPrincipal CustomUserDetails loginUser,
                        String username,
                        Model model) {
+
+        if (username == null || username.isEmpty()){
+            return "user/find";
+        }
 
         List<User> findUserList = userService.findByUsernamePrefix(username);
 

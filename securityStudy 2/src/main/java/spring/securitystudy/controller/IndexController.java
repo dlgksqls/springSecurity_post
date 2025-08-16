@@ -1,6 +1,9 @@
     package spring.securitystudy.controller;
 
+    import jakarta.servlet.http.Cookie;
+    import jakarta.servlet.http.HttpServletRequest;
     import lombok.RequiredArgsConstructor;
+    import lombok.extern.slf4j.Slf4j;
     import org.springframework.data.domain.Page;
     import org.springframework.security.core.annotation.AuthenticationPrincipal;
     import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,7 +16,9 @@
     import spring.securitystudy.user.service.UserService;
     import spring.securitystudy.post.dto.PostViewDto;
     import spring.securitystudy.post.service.PostService;
+    import spring.securitystudy.util.JWTUtil;
 
+    import java.net.http.HttpRequest;
     import java.util.List;
 
     @Controller
@@ -25,16 +30,17 @@
         private final FriendShipServiceImpl friendShipService;
 
         @GetMapping("/")
-        public String index(Model model,
+        public String index(@AuthenticationPrincipal CustomUserDetails loginUser,
                             @RequestParam(defaultValue = "0") int page,
-                            @AuthenticationPrincipal CustomUserDetails userDetails) {
-            if (userDetails != null) {
+                            Model model){
+
+            if (loginUser != null) {
                 CustomUserDetails findMember = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //                List<PostViewDto> allPost = postService.findAll();
                 Page<PostViewDto> pagePosts = postService.findAllByPage(page, 10);
                 List<String> friendList = friendShipService.findFriendShipList(findMember.getUser());
 
-                model.addAttribute("username", userDetails.getUsername());
+                model.addAttribute("username", loginUser.getUsername());
                 model.addAttribute("posts", pagePosts.getContent());
                 model.addAttribute("friendList", friendList);
                 model.addAttribute("currentPage", page);

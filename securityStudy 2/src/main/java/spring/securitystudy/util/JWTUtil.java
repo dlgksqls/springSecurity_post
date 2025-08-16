@@ -4,8 +4,11 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import spring.securitystudy.user.CustomUserDetails;
 import spring.securitystudy.user.exception.TokenExpiredException;
 
 import javax.crypto.SecretKey;
@@ -13,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
+@Slf4j
 public class JWTUtil {
     private SecretKey secretKey;
     private int accessTokenExpiration;
@@ -38,6 +42,32 @@ public class JWTUtil {
                 .parser()
                 .verifyWith(secretKey).build()
                 .parseSignedClaims(token).getPayload().get("role", String.class);
+    }
+
+    public void validateSession(CustomUserDetails loginUser, Cookie[] cookies){
+        String auth = null;
+        String refreshAuth = null;
+        if (cookies != null){
+            for (Cookie cookie : cookies) {
+                if ("Authentication".equals(cookie.getName())) auth = cookie.getValue();
+                if ("RefreshToken".equals(cookie.getName())) refreshAuth = cookie.getValue();
+            }
+        }
+
+        try {
+            validateToken(auth);
+        } catch (TokenExpiredException e){
+            log.error("auth 토큰 만료");
+            try {
+                validateToken(refreshAuth);
+                createAccessToken(loginUser.getUsername(),
+                        loginUser.getAuthorities().iterator().next().getAuthority());
+                log.info("auth 토큰 생성: {}", auth);
+            } catch (TokenExpiredException ex){
+                log.info("세션 만료");
+                throw new TokenExpiredException("세션이 만료됐습니다. 다시 로그인 하세요.");
+            }
+        }
     }
 
     public void validateToken(String token){

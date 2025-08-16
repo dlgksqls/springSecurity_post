@@ -11,6 +11,7 @@ import spring.securitystudy.user.dto.UserProfile;
 import spring.securitystudy.user.dto.UserRegisterDto;
 import spring.securitystudy.user.dto.UserUpdateDto;
 import spring.securitystudy.user.entity.User;
+import spring.securitystudy.user.exception.FindUserNotExistException;
 import spring.securitystudy.user.exception.UserAlreadyExistsException;
 import spring.securitystudy.user.exception.UserNotFoundException;
 import spring.securitystudy.user.repository.UserRepository;
@@ -18,10 +19,7 @@ import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
 import spring.securitystudy.post.repository.PostRepository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,8 +59,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findByUsernamePrefix(String prefix) {
-        return userRepository.findByUsernamePrefix(prefix)
-                .orElseThrow(() -> new UserNotFoundException("해당 사용자는 없습니다."));
+        List<User> findUsers = userRepository.findByUsernamePrefix(prefix);
+
+        if (findUsers.isEmpty()) {
+            throw new FindUserNotExistException("해당 사용자를 찾을 수 없습니다.");
+        }
+
+        return findUsers;
     }
 
     @Override
