@@ -93,9 +93,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
             } catch (TokenExpiredException ex) {
                 log.info("RefreshToken 만료, 재로그인 필요");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.sendRedirect(request.getContextPath() + "/user/login?error=true&message=SessionDeny");
-                filterChain.doFilter(request, response);
                 return;
             }
         }

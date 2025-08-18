@@ -24,7 +24,7 @@ public class Post {
     private LocalDate createdDate;
     private LocalDate updatedDate;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
     private User user;
 

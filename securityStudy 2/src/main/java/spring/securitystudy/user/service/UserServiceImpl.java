@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import spring.securitystudy.exception.UserNotFoundException;
 import spring.securitystudy.friendship.entity.Status;
 import spring.securitystudy.friendship.repository.FriendShipRepository;
 import spring.securitystudy.image.entity.Image;
@@ -11,9 +12,7 @@ import spring.securitystudy.user.dto.UserProfile;
 import spring.securitystudy.user.dto.UserRegisterDto;
 import spring.securitystudy.user.dto.UserUpdateDto;
 import spring.securitystudy.user.entity.User;
-import spring.securitystudy.user.exception.FindUserNotExistException;
 import spring.securitystudy.user.exception.UserAlreadyExistsException;
-import spring.securitystudy.user.exception.UserNotFoundException;
 import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
@@ -62,7 +61,7 @@ public class UserServiceImpl implements UserService {
         List<User> findUsers = userRepository.findByUsernamePrefix(prefix);
 
         if (findUsers.isEmpty()) {
-            throw new FindUserNotExistException("해당 사용자를 찾을 수 없습니다.");
+            throw new UserNotFoundException("해당 사용자를 찾을 수 없습니다.");
         }
 
         return findUsers;

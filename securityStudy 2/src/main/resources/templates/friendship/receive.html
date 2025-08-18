@@ -1,5 +1,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
+    <div th:if="${errorMessage}">
+        <p th:text="${errorMessage}" style="color:red"></p>
+    </div>
+
     <div th:if="${#lists.isEmpty(receiveList)}">
         <strong>받은 요청이 없습니다.</strong>
     </div>

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import spring.securitystudy.friendship.dto.FriendShipReturnDto;
 import spring.securitystudy.friendship.entity.FriendShip;
 import spring.securitystudy.friendship.entity.Status;
+import spring.securitystudy.friendship.exception.FriendShipNotFoundException;
 import spring.securitystudy.friendship.exception.HandleUserNotExistException;
 import spring.securitystudy.friendship.exception.ReceiveUserNotFoundException;
 import spring.securitystudy.friendship.repository.FriendShipRepository;
@@ -30,7 +31,7 @@ public class FriendShipServiceImpl implements FriendShipService{
 
         FriendShip newFriendShip = new FriendShip();
         User requestUser = memberRepository.findByUsername(loginUser)
-                .orElseThrow(() -> new UserNotFoundException("해당 유저는 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException("로그인 해주세요."));
 
         newFriendShip.save(requestUser, receiveMember);
 
@@ -83,7 +84,8 @@ public class FriendShipServiceImpl implements FriendShipService{
         User requestMember = memberRepository.findByUsername(requestMemberName)
                 .orElseThrow(() -> new HandleUserNotExistException("해당 유저는 없습니다."));
 
-        return friendShipRepository.findByLoginMemberAndRequestMember(receiveMember, requestMember);
+        return friendShipRepository.findByLoginMemberAndRequestMember(receiveMember, requestMember)
+                .orElseThrow(() -> new FriendShipNotFoundException("해당 관계를 찾을 수 없습니다."));
     }
 
     private static void removeFriendShipCollection(FriendShip friendShip) {

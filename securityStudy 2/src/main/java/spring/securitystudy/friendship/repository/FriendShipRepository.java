@@ -35,7 +35,7 @@ public interface FriendShipRepository extends JpaRepository<FriendShip, Long> {
             "FROM FriendShip fs " +
             "JOIN FETCH fs.receiveUser JOIN FETCH fs.sendUser " +
             "WHERE fs.receiveUser = :receiveUser AND fs.sendUser = :requestUser")
-    FriendShip findByLoginMemberAndRequestMember(@Param("receiveUser") User receiveUser, @Param("requestUser") User requestUser);
+    Optional<FriendShip> findByLoginMemberAndRequestMember(@Param("receiveUser") User receiveUser, @Param("requestUser") User requestUser);
 
     @Query("SELECT fs " +
             "FROM FriendShip fs " +

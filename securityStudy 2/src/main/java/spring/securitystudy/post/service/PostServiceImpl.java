@@ -8,14 +8,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import spring.securitystudy.comment.dto.CommentDto;
+import spring.securitystudy.exception.PostNotFoundException;
+import spring.securitystudy.exception.UserNotFoundException;
 import spring.securitystudy.image.dto.ImageUploadDto;
 import spring.securitystudy.image.dto.ImageUrlsDto;
 import spring.securitystudy.image.entity.Image;
 import spring.securitystudy.image.repository.ImageRepository;
 import spring.securitystudy.image.service.ImageService;
-import spring.securitystudy.post.exception.PostNotFoundException;
 import spring.securitystudy.user.entity.User;
-import spring.securitystudy.user.exception.UserNotFoundException;
 import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.post.dto.PostCommentImageDto;
 import spring.securitystudy.post.dto.PostCreateDto;
@@ -91,6 +91,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostCommentImageDto findCommentPost(Long id) {
         Post findPost = findById(id);
+
         List<CommentDto> postComment = postRepository.findCommentByPostId(id);
         List<ImageUrlsDto> postImage = postRepository.findImageByPostId(id);
 

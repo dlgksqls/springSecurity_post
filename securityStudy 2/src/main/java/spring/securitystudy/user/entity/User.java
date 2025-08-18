@@ -25,16 +25,16 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",  cascade = CascadeType.REMOVE)
     private List<Post> postList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",  cascade = CascadeType.REMOVE)
     private List<Comment> commentList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "sendUser")
+    @OneToMany(mappedBy = "sendUser",  cascade = CascadeType.REMOVE)
     private List<FriendShip> sendList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "receiveUser")
+    @OneToMany(mappedBy = "receiveUser",  cascade = CascadeType.REMOVE)
     private List<FriendShip> reveiveList = new ArrayList<>();
 
     public void createUser(UserRegisterDto dto, PasswordEncoder passwordEncoder) {
