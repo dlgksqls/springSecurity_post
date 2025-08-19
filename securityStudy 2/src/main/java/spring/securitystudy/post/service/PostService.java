@@ -7,6 +7,7 @@ import spring.securitystudy.post.dto.PostCreateDto;
 import spring.securitystudy.post.dto.PostUpdateDto;
 import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
+import spring.securitystudy.user.entity.User;
 
 import java.util.List;
 
@@ -23,9 +24,10 @@ public interface PostService {
      * 모든 게시글을 paging으로 불러오기
      * @param page 페이지 번호
      * @param size 몇개를 불러올 것인가
+     * @param loginUser
      * @return
      */
-    Page<PostViewDto> findAllByPage(int page, int size);
+    Page<PostViewDto> findAllByPage(int page, int size, User loginUser);
 
     /**
      * postId로 특정 post 조회

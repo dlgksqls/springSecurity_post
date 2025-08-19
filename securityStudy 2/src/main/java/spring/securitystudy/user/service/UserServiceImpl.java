@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
         List<PostViewDto> postDto = new ArrayList<>();
         for (Post post : postByUsername) {
             List<String> imageUrls = post.getImageList().stream().map(Image::getUrl).collect(Collectors.toList());
-            postDto.add(new PostViewDto(post, imageUrls, true));
+            postDto.add(new PostViewDto(post, imageUrls, post.getLikeCnt(), true));
         }
         return UserProfile.builder()
                 .username(username)

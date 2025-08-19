@@ -11,7 +11,7 @@ import spring.securitystudy.friendship.exception.HandleUserNotExistException;
 import spring.securitystudy.friendship.exception.ReceiveUserNotFoundException;
 import spring.securitystudy.friendship.repository.FriendShipRepository;
 import spring.securitystudy.user.entity.User;
-import spring.securitystudy.user.exception.UserNotFoundException;
+import spring.securitystudy.exception.UserNotFoundException;
 import spring.securitystudy.user.repository.UserRepository;
 
 import java.util.List;

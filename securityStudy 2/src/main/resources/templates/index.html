@@ -44,6 +44,11 @@
                 <p th:text="${post.getCreatedDate()}">작성일</p>
                 <p th:text="${post.getWriter()}">작성자</p>
                 <p th:text="${post.getContent()}">내용</p>
+                <p th:text="'좋아요: ' + ${post.getLikeCnt()}">좋아요 수</p>
+
+                <form th:action="@{/like/{id}(id=${post.id})}" method="post">
+                    <button type="submit" th:text="${post.likeByLoginUser} ? '좋아요 취소' : '좋아요'"></button>
+                </form>
 
                 <!-- 이미지 출력 -->
                 <div th:if="${!post.imageUrls.isEmpty()}" th:each="image : ${post.imageUrls}">

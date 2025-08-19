@@ -15,6 +15,9 @@ import spring.securitystudy.image.dto.ImageUrlsDto;
 import spring.securitystudy.image.entity.Image;
 import spring.securitystudy.image.repository.ImageRepository;
 import spring.securitystudy.image.service.ImageService;
+import spring.securitystudy.like.entity.Like;
+import spring.securitystudy.like.repository.LikeRepository;
+import spring.securitystudy.like.service.LikeService;
 import spring.securitystudy.user.entity.User;
 import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.post.dto.PostCommentImageDto;
@@ -24,8 +27,7 @@ import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
 import spring.securitystudy.post.repository.PostRepository;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,11 +35,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PostServiceImpl implements PostService {
 
+    private final ImageService imageService;
+
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
-
-    private final ImageService imageService;
+    private final LikeRepository likeRepository;
 
     @Override
     @Transactional
@@ -53,9 +56,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<PostViewDto> findAllByPage(int page, int size){
+    public Page<PostViewDto> findAllByPage(int page, int size, User loginUser){
         PageRequest pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
         Page<PostViewDto> pagePosts = postRepository.findAllWithMember(pageable);
+
         List<Long> postIds = pagePosts.stream().map(PostViewDto::getId).toList();
         List<Image> images = imageRepository.findAllByPostId(postIds);
         Map<Long, List<String>> postImage = images.stream()
@@ -64,9 +68,13 @@ public class PostServiceImpl implements PostService {
                         Collectors.mapping(Image::getUrl, Collectors.toList())
                 ));
 
-        pagePosts.forEach(post -> {
-            List<String> urls = postImage.getOrDefault(post.getId(), List.of());
-            post.setImageUrls(urls);
+        Set<Long> likePostIds = (loginUser != null) ?
+                new HashSet<>(likeRepository.findByUser(loginUser))
+                : new HashSet<>();
+
+        pagePosts.forEach(postViewDto -> {
+            postViewDto.setImageUrls(postImage.getOrDefault(postViewDto.getId(), List.of()));
+            postViewDto.setLikeByLoginUser(likePostIds.contains(postViewDto.getId()));
         });
 
         return pagePosts;

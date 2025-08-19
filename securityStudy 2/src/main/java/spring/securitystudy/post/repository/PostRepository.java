@@ -25,7 +25,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * Post 10개에 Image 20개 있으면 → 결과 row는 20개 (중복된 Post가 생김) => error
      */
     @Query(
-            value = "SELECT new spring.securitystudy.post.dto.PostViewDto(p.id, p.title, p.content, p.user.username, p.user.isFriendOnly, p.createdDate) " +
+            value = "SELECT new spring.securitystudy.post.dto.PostViewDto(p.id, p.title, p.content, p.user.username, p.user.isFriendOnly, p.likeCnt, p.createdDate) " +
                     "FROM Post p JOIN p.user " +
                     "ORDER BY p.id DESC",
             countQuery = "SELECT COUNT(p) FROM Post p"

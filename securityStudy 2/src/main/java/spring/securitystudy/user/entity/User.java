@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import spring.securitystudy.comment.entity.Comment;
 import spring.securitystudy.friendship.entity.FriendShip;
+import spring.securitystudy.like.entity.Like;
 import spring.securitystudy.user.dto.UserRegisterDto;
 import spring.securitystudy.user.dto.UserUpdateDto;
 import spring.securitystudy.post.entity.Post;
@@ -36,6 +37,9 @@ public class User {
 
     @OneToMany(mappedBy = "receiveUser",  cascade = CascadeType.REMOVE)
     private List<FriendShip> reveiveList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Like> likeList = new ArrayList<>();
 
     public void createUser(UserRegisterDto dto, PasswordEncoder passwordEncoder) {
         this.username = dto.getUsername();
@@ -86,5 +90,13 @@ public class User {
     public void changeFriendOnly(boolean friendOnly) {
         if (this.isFriendOnly == friendOnly) return;
         this.isFriendOnly = friendOnly;
+    }
+
+    public void addLike(Like like) {
+        this.likeList.add(like);
+    }
+
+    public void removeLike(Like deleteLike) {
+        this.likeList.remove(deleteLike);
     }
 }

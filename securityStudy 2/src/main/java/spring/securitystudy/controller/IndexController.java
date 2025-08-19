@@ -11,7 +11,9 @@
     import org.springframework.ui.Model;
     import org.springframework.web.bind.annotation.GetMapping;
     import org.springframework.web.bind.annotation.RequestParam;
+    import spring.securitystudy.friendship.service.FriendShipService;
     import spring.securitystudy.friendship.service.FriendShipServiceImpl;
+    import spring.securitystudy.like.service.LikeService;
     import spring.securitystudy.user.CustomUserDetails;
     import spring.securitystudy.user.service.UserService;
     import spring.securitystudy.post.dto.PostViewDto;
@@ -27,7 +29,8 @@
 
         private final UserService userService;
         private final PostService postService;
-        private final FriendShipServiceImpl friendShipService;
+        private final FriendShipService friendShipService;
+        private final LikeService likeService;
 
         @GetMapping("/")
         public String index(@AuthenticationPrincipal CustomUserDetails loginUser,
@@ -35,10 +38,9 @@
                             Model model){
 
             if (loginUser != null) {
-                CustomUserDetails findMember = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //                List<PostViewDto> allPost = postService.findAll();
-                Page<PostViewDto> pagePosts = postService.findAllByPage(page, 10);
-                List<String> friendList = friendShipService.findFriendShipList(findMember.getUser());
+                Page<PostViewDto> pagePosts = postService.findAllByPage(page, 10, loginUser.getUser());
+                List<String> friendList = friendShipService.findFriendShipList(loginUser.getUser());
 
                 model.addAttribute("username", loginUser.getUsername());
                 model.addAttribute("posts", pagePosts.getContent());

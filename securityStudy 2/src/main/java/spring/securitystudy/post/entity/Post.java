@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.hibernate.annotations.BatchSize;
 import spring.securitystudy.comment.entity.Comment;
 import spring.securitystudy.image.entity.Image;
+import spring.securitystudy.like.entity.Like;
 import spring.securitystudy.user.entity.User;
 import spring.securitystudy.post.dto.PostCreateDto;
 import spring.securitystudy.post.dto.PostUpdateDto;
@@ -21,11 +22,12 @@ public class Post {
     private Long id;
     private String title;
     private String content;
+    private int likeCnt = 0;
     private LocalDate createdDate;
     private LocalDate updatedDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberId")
+    @JoinColumn(name = "userId")
     private User user;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
@@ -34,6 +36,9 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     @BatchSize(size = 10)
     private List<Image> imageList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<Like> likeList = new ArrayList<>();
 
     public static Post create(PostCreateDto dto, User loginUser) {
         Post post = new Post();
@@ -72,5 +77,15 @@ public class Post {
 
     public void addImage(Image image) {
         this.getImageList().add(image);
+    }
+
+    public void addLike(Like like) {
+        this.likeList.add(like);
+        this.likeCnt ++;
+    }
+
+    public void removeLike(Like deleteLike) {
+        this.likeList.remove(deleteLike);
+        this.likeCnt ++;
     }
 }

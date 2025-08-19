@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import spring.securitystudy.user.CustomUserDetails;
 import spring.securitystudy.user.entity.User;
-import spring.securitystudy.user.exception.UserNotFoundException;
+import spring.securitystudy.exception.UserNotFoundException;
 import spring.securitystudy.user.repository.UserRepository;
 
 @Service
