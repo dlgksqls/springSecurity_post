@@ -23,6 +23,6 @@ public class LikeController {
         if (loginUser == null) throw new UserNotFoundException("로그인을 해주세요");
         likeService.handleLike(postId, loginUser.getUser());
 
-        return "redirect:/post/detail/" + postId;
+        return "redirect:/";
     }
 }

@@ -86,6 +86,6 @@ public class Post {
 
     public void removeLike(Like deleteLike) {
         this.likeList.remove(deleteLike);
-        this.likeCnt ++;
+        this.likeCnt --;
     }
 }
