@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 import spring.securitystudy.user.exception.TokenExpiredException;
-import spring.securitystudy.util.JWTUtil;
+import spring.securitystudy.util.jwt.JWTUtil;
 
 import java.io.IOException;
 

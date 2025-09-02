@@ -1,4 +1,4 @@
-package spring.securitystudy.util;
+package spring.securitystudy.util.security;
 
 import spring.securitystudy.user.entity.User;
 

@@ -1,4 +1,4 @@
-package spring.securitystudy.util;
+package spring.securitystudy.util.jwt;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;

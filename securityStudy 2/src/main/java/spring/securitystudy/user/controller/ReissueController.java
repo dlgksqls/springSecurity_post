@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import spring.securitystudy.user.CustomUserDetails;
 import spring.securitystudy.user.exception.TokenExpiredException;
-import spring.securitystudy.util.JWTUtil;
+import spring.securitystudy.util.jwt.JWTUtil;
 
 @Controller
 @RequiredArgsConstructor

@@ -1,14 +1,17 @@
 package spring.securitystudy.user.advice;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import spring.securitystudy.exception.UserNotFoundException;
+import spring.securitystudy.user.exception.EmailNotVerifiedException;
 import spring.securitystudy.user.exception.TokenExpiredException;
 import spring.securitystudy.user.exception.UserAlreadyExistsException;
 
 @ControllerAdvice(basePackages = {"spring.securitystudy.user.controller"})
+@RequiredArgsConstructor
 public class UserControllerAdvice {
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -27,5 +30,11 @@ public class UserControllerAdvice {
     public String TokenExpiredException(RuntimeException ex, RedirectAttributes redirectAttributes){
         redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         return "redirect:/user/error";
+    }
+
+    @ExceptionHandler(EmailNotVerifiedException.class)
+    public String EmailNotVerifiedException(RuntimeException ex, RedirectAttributes redirectAttributes){
+        redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        return "redirect:/check-email";
     }
 }

@@ -1,7 +1,5 @@
 package spring.securitystudy.user.controller;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -13,7 +11,7 @@ import spring.securitystudy.user.dto.UserRegisterDto;
 import spring.securitystudy.user.dto.UserUpdateDto;
 import spring.securitystudy.user.entity.User;
 import spring.securitystudy.user.service.UserService;
-import spring.securitystudy.util.SecurityUtil;
+import spring.securitystudy.util.security.SecurityUtil;
 
 import java.security.Principal;
 import java.util.List;
@@ -40,7 +38,7 @@ public class UserController {
     @PostMapping("/register")
     public String register(UserRegisterDto dto){
         userService.register(dto);
-        return "redirect:/user/login"; // / 붙여주기 맨 앞에
+        return "redirect:/user/check-emil"; // / 붙여주기 맨 앞에
     }
 
     @GetMapping("/login")

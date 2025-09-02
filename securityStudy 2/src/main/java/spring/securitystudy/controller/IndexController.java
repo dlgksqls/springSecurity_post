@@ -1,26 +1,19 @@
     package spring.securitystudy.controller;
 
-    import jakarta.servlet.http.Cookie;
-    import jakarta.servlet.http.HttpServletRequest;
     import lombok.RequiredArgsConstructor;
-    import lombok.extern.slf4j.Slf4j;
     import org.springframework.data.domain.Page;
     import org.springframework.security.core.annotation.AuthenticationPrincipal;
-    import org.springframework.security.core.context.SecurityContextHolder;
     import org.springframework.stereotype.Controller;
     import org.springframework.ui.Model;
     import org.springframework.web.bind.annotation.GetMapping;
     import org.springframework.web.bind.annotation.RequestParam;
     import spring.securitystudy.friendship.service.FriendShipService;
-    import spring.securitystudy.friendship.service.FriendShipServiceImpl;
     import spring.securitystudy.like.service.LikeService;
     import spring.securitystudy.user.CustomUserDetails;
     import spring.securitystudy.user.service.UserService;
     import spring.securitystudy.post.dto.PostViewDto;
     import spring.securitystudy.post.service.PostService;
-    import spring.securitystudy.util.JWTUtil;
 
-    import java.net.http.HttpRequest;
     import java.util.List;
 
     @Controller

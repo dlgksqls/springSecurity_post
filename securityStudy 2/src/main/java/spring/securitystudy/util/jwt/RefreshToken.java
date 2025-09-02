@@ -1,4 +1,4 @@
-package spring.securitystudy.util;
+package spring.securitystudy.util.jwt;
 
 import lombok.Getter;
 import org.springframework.data.annotation.Id;

@@ -20,11 +20,19 @@ public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column(unique = true, nullable = false)
     private String username;
+
     private String password;
     private boolean isFriendOnly = false;
+
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    private boolean enable = false; // 이메일 인증 여부
 
     @OneToMany(mappedBy = "user",  cascade = CascadeType.REMOVE)
     private List<Post> postList = new ArrayList<>();
@@ -98,5 +106,9 @@ public class User {
 
     public void removeLike(Like deleteLike) {
         this.likeList.remove(deleteLike);
+    }
+
+    public void enable() {
+        this.enable = true;
     }
 }

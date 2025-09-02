@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import spring.securitystudy.user.exception.TokenExpiredException;
+import spring.securitystudy.util.jwt.JWTUtil;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -1,18 +1,15 @@
 package spring.securitystudy.config;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,9 +21,8 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 import spring.securitystudy.filter.JWTFilter;
 import spring.securitystudy.filter.LoginFilter;
 import spring.securitystudy.user.repository.RefreshTokenRepository;
-import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.user.service.UserDetailsServiceImpl;
-import spring.securitystudy.util.JWTUtil;
+import spring.securitystudy.util.jwt.JWTUtil;
 
 @Configuration
 @EnableWebSecurity

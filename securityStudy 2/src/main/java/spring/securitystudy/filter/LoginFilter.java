@@ -11,13 +11,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import spring.securitystudy.exception.UserNotFoundException;
 import spring.securitystudy.user.CustomUserDetails;
+import spring.securitystudy.user.entity.User;
+import spring.securitystudy.user.exception.EmailNotVerifiedException;
 import spring.securitystudy.user.repository.RefreshTokenRepository;
-import spring.securitystudy.util.JWTUtil;
-import spring.securitystudy.util.RefreshToken;
+import spring.securitystudy.user.repository.UserRepository;
+import spring.securitystudy.util.jwt.JWTUtil;
+import spring.securitystudy.util.jwt.RefreshToken;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -26,12 +29,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository) {
+    public LoginFilter(AuthenticationManager authenticationManager,
+                       JWTUtil jwtUtil,
+                       RefreshTokenRepository refreshTokenRepository,
+                       UserRepository userRepository) {
         super();
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -40,6 +48,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String username = obtainUsername(request);
         String password = obtainPassword(request);
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 계정입니다."));
+
+        if (!user.isEnable()){
+            throw new EmailNotVerifiedException("이메일 인증이 완료되지 않았습니다.");
+        }
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password);
 
