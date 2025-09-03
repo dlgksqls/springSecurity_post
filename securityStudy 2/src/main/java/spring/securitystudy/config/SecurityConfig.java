@@ -21,6 +21,7 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 import spring.securitystudy.filter.JWTFilter;
 import spring.securitystudy.filter.LoginFilter;
 import spring.securitystudy.user.repository.RefreshTokenRepository;
+import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.user.service.UserDetailsServiceImpl;
 import spring.securitystudy.util.jwt.JWTUtil;
 
@@ -33,11 +34,17 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final UserDetailsService userDetailsService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
     private final JWTUtil jwtUtil;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenRepository);
+        LoginFilter loginFilter = new LoginFilter(
+                authenticationManager(authenticationConfiguration),
+                jwtUtil,
+                refreshTokenRepository,
+                userRepository
+        );
         loginFilter.setFilterProcessesUrl("/user/login");
 
         http
@@ -46,7 +53,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/css/**", "/js/**", "/images/**", "/webjars/**", "/templates/chat.html",
-                                "/", "/user/register", "/ws-stomp/**", "/user/login", "/user/error", "/favicon.io"
+                                "/", "/user/register", "/ws-stomp/**", "/user/login", "/user/error","/user/check-email",
+                                "/verify", "/sendMail", "/favicon.io"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

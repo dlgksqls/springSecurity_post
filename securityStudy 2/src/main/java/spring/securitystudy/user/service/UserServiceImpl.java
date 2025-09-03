@@ -17,6 +17,7 @@ import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
 import spring.securitystudy.post.repository.PostRepository;
+import spring.securitystudy.verificationToken.service.VerificationService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,6 +30,8 @@ public class UserServiceImpl implements UserService {
     private final PostRepository postRepository;
     private final FriendShipRepository friendShipRepository;
 
+    private final VerificationService verificationService;
+
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -40,7 +43,10 @@ public class UserServiceImpl implements UserService {
 
         User user = new User();
         user.createUser(dto, passwordEncoder);
+
         userRepository.save(user);
+
+        verificationService.sendVerificationEmail(user);
 
         return user;
     }

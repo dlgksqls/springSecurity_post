@@ -1,6 +1,8 @@
 package spring.securitystudy.user.exception;
 
-public class EmailNotVerifiedException extends RuntimeException{
+import org.springframework.security.core.AuthenticationException;
+
+public class EmailNotVerifiedException extends AuthenticationException {
     public EmailNotVerifiedException(String message) {
         super(message);
     }

@@ -26,11 +26,12 @@ public class VerificationServiceImpl implements VerificationService{
 
         tokenRepository.save(verificationToken);
 
-        String link = "http://localhost:8080/auth/verify?token=" + token;
+        String link = "http://localhost:8080/verify?token=" + token;
         String subject = "이메일 인증";
-        String text = "아래 링크를 클릭하여 인증을 완료하세요:\n" + link;
+        String htmlText = "<p>아래 링크를 클릭하여 인증을 완료하세요:</p>" +
+                "<a href=\"" + link + "\">인증하기</a>";
 
-        emailSender.send(user.getEmail(), subject, text);
+        emailSender.send(user.getEmail(), subject, htmlText);
     }
 
     @Override

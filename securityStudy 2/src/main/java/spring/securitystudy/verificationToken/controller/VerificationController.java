@@ -33,8 +33,11 @@ public class VerificationController {
         }
     }
 
-    @PostMapping("/sendMail")
+    @GetMapping("/sendMail")
     public String sendMail(@AuthenticationPrincipal User user){
+        if (user == null || user.isEnable()) {
+            return "redirect:/user/login?error=true&message=Invalid Access";
+        }
         verificationService.sendVerificationEmail(user);
         return "redirect:/user/check-email";
     }

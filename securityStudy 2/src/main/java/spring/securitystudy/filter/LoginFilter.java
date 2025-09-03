@@ -105,6 +105,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.sendRedirect("/");
     }
 
+    // filter는 스프링 mvc 앞에서 거르는 용도이므로 advice에서 예외 처리 불가
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request,
                                               HttpServletResponse response,
@@ -113,9 +114,19 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
 
-        // 로그인 창으로 리다이렉트
-        response.sendRedirect(request.getContextPath() + "/user/login?error=true&message=Check Your Id Or Password");
+        // 이메일 인증 안 된 경우
+        if (failed instanceof EmailNotVerifiedException){
+            response.sendRedirect(request.getContextPath() + "/user/check-email?error=notVerified");
+            return;
+        }
 
+        // 존재하지 않는 계정
+        if (failed instanceof UserNotFoundException){
+            response.sendRedirect(request.getContextPath() + "/user/login?error=true&message=Check Your Id Or Password");
+            return;
+        }
+
+        response.sendRedirect(request.getContextPath() + "/user/login?error=true&message=Check Your Id Or Password");
     }
 
     @Override

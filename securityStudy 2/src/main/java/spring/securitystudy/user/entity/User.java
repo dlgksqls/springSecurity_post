@@ -52,6 +52,7 @@ public class User {
     public void createUser(UserRegisterDto dto, PasswordEncoder passwordEncoder) {
         this.username = dto.getUsername();
         this.password = passwordEncoder.encode(dto.getPassword());
+        this.email = dto.getEmail();
         this.role = Role.USER;
     }
 
@@ -64,12 +65,14 @@ public class User {
 
     public void createFirstUser(PasswordEncoder passwordEncoder) {
         this.username = "admin";
+        this.email = "1234@naver.com";
         this.password = passwordEncoder.encode("1234");
         this.role = Role.USER;
     }
 
     public void createSecondUser(PasswordEncoder passwordEncoder) {
         this.username = "user";
+        this.email = "999@naver.com";
         this.password = passwordEncoder.encode("1234");
         this.role = Role.USER;
     }

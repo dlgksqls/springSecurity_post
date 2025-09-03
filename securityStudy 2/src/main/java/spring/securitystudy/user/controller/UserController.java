@@ -38,7 +38,7 @@ public class UserController {
     @PostMapping("/register")
     public String register(UserRegisterDto dto){
         userService.register(dto);
-        return "redirect:/user/check-emil"; // / 붙여주기 맨 앞에
+        return "redirect:/user/check-email"; // / 붙여주기 맨 앞에
     }
 
     @GetMapping("/login")
