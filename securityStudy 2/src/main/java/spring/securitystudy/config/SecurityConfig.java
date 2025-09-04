@@ -53,9 +53,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/css/**", "/js/**", "/images/**", "/webjars/**", "/templates/chat.html",
-                                "/", "/user/register", "/ws-stomp/**", "/user/login", "/user/error","/user/check-email",
-                                "/verify", "/sendMail", "/favicon.io"
+                                "/", "/user/register", "/ws-stomp/**", "/user/login", "/user/error", "/favicon.io"
                         ).permitAll()
+                        .requestMatchers(
+                                "/user/check-email", "/verify", "/sendMail"
+                        ).hasRole("UNVERIFIED")
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(memberDetailsService)

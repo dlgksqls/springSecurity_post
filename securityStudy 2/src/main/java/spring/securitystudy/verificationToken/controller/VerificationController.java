@@ -2,11 +2,14 @@ package spring.securitystudy.verificationToken.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import spring.securitystudy.user.CustomUserDetails;
 import spring.securitystudy.user.entity.User;
+import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.user.service.UserService;
 import spring.securitystudy.verificationToken.service.VerificationService;
 
@@ -15,6 +18,7 @@ import spring.securitystudy.verificationToken.service.VerificationService;
 public class VerificationController {
 
     private final VerificationService verificationService;
+    private final UserService userService;
 
     @GetMapping("/user/check-email")
     public String checkEmailPage(){
@@ -34,11 +38,12 @@ public class VerificationController {
     }
 
     @GetMapping("/sendMail")
-    public String sendMail(@AuthenticationPrincipal User user){
-        if (user == null || user.isEnable()) {
+    public String sendMail(@AuthenticationPrincipal CustomUserDetails user){
+        User loginUser = userService.findByUsername(user.getUsername());
+        if (loginUser == null || loginUser.isEnable()) {
             return "redirect:/user/login?error=true&message=Invalid Access";
         }
-        verificationService.sendVerificationEmail(user);
+        verificationService.sendVerificationEmail(loginUser);
         return "redirect:/user/check-email";
     }
 }

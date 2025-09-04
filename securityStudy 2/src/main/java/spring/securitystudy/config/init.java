@@ -42,7 +42,7 @@ public class init {
             UserRegisterDto UserDto = new UserRegisterDto();
             UserDto.setUsername(Integer.toString(i));
             UserDto.setPassword(Integer.toString(1234));
-            UserDto.setEmail(i * 5 + "@naver.com");
+            UserDto.setEmail(i * 5 + "@email.com");
             user.createUser(UserDto, passwordEncoder);
             userRepository.save(user);
 

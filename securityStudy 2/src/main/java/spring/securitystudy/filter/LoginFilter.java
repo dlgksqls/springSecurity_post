@@ -14,9 +14,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import spring.securitystudy.exception.UserNotFoundException;
 import spring.securitystudy.user.CustomUserDetails;
 import spring.securitystudy.user.entity.User;
-import spring.securitystudy.user.exception.EmailNotVerifiedException;
 import spring.securitystudy.user.repository.RefreshTokenRepository;
 import spring.securitystudy.user.repository.UserRepository;
+import spring.securitystudy.util.cookie.CreateTokenAndCookie;
 import spring.securitystudy.util.jwt.JWTUtil;
 import spring.securitystudy.util.jwt.RefreshToken;
 
@@ -30,6 +30,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final JWTUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
+    private final CreateTokenAndCookie createTokenAndCookie;
 
     public LoginFilter(AuthenticationManager authenticationManager,
                        JWTUtil jwtUtil,
@@ -40,6 +41,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
+        this.createTokenAndCookie = new CreateTokenAndCookie(jwtUtil);
     }
 
     @Override
@@ -51,10 +53,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 계정입니다."));
-
-        if (!user.isEnable()){
-            throw new EmailNotVerifiedException("이메일 인증이 완료되지 않았습니다.");
-        }
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password);
 
@@ -76,32 +74,38 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String role = authority.getAuthority();
 
-        // 1. Access Token 생성
-        String token = jwtUtil.createAccessToken(username, role); // 15분
+        // 이메일 인증을 하지 않았다면
+        if (!userDetails.getUser().isEnable()){
+            String token = createTokenAndCookie.createToken(username, "UNVERIFIED", "access");
+            String refreshToken = createTokenAndCookie.createToken(username, null, "refresh");
 
-        // 2. Refresh Token 생셩
-        String refreshToken = jwtUtil.createRefreshToken(username); // 2주
+            // 쿠키 발급
+            Cookie unverifiedToken = createTokenAndCookie.createCookie("Authentication", token);
+
+            response.addCookie(unverifiedToken);
+
+            response.sendRedirect(request.getContextPath() + "/user/check-email?error=notVerified");
+            return;
+        }
+
+        // 1. Access Token 생성
+        String token = createTokenAndCookie.createToken(username, role, "access");
+
+        // 2. Refresh Token 생셩 (2주)
+        String refreshToken = createTokenAndCookie.createToken(username, null, "refresh");
         RefreshToken redis = new RefreshToken(username, refreshToken);
         refreshTokenRepository.save(redis);
 
         // Access Token 쿠키 설정
-        Cookie accessTokenCookie = new Cookie("Authentication", token);
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(false); // HTTPS 사용 시 true로 설정하기
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(jwtUtil.getAccessTokenExpiration() + 60);
+        Cookie accessTokenCookie = createTokenAndCookie.createCookie("Authentication", token);
 
         // Refresh Token 쿠키 설정 (새롭게 추가)
-        Cookie refreshTokenCookie = new Cookie("RefreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(false);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(jwtUtil.getRefreshTokenExpiration() * 60);
+        Cookie refreshTokenCookie = createTokenAndCookie.createCookie("RefreshToken", refreshToken);
 
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
 
-        // 로그인 성공 후 리다이렉트
+        // 로그인 성공 후 이메일 인증을 했다면 index로 redirect
         response.sendRedirect("/");
     }
 
@@ -113,12 +117,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             throws IOException, ServletException {
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
-
-        // 이메일 인증 안 된 경우
-        if (failed instanceof EmailNotVerifiedException){
-            response.sendRedirect(request.getContextPath() + "/user/check-email?error=notVerified");
-            return;
-        }
 
         // 존재하지 않는 계정
         if (failed instanceof UserNotFoundException){

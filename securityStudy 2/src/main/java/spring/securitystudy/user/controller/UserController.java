@@ -1,5 +1,7 @@
 package spring.securitystudy.user.controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import spring.securitystudy.user.dto.UserRegisterDto;
 import spring.securitystudy.user.dto.UserUpdateDto;
 import spring.securitystudy.user.entity.User;
 import spring.securitystudy.user.service.UserService;
+import spring.securitystudy.util.cookie.CreateTokenAndCookie;
 import spring.securitystudy.util.security.SecurityUtil;
 
 import java.security.Principal;
@@ -24,6 +27,7 @@ public class UserController {
 
     private final UserService userService;
     private final SecurityUtil securityUtil;
+    private final CreateTokenAndCookie createTokenAndCookie;
 
     @GetMapping("/error")
     public String error(){
@@ -36,8 +40,15 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String register(UserRegisterDto dto){
+    public String register(UserRegisterDto dto, HttpServletResponse response){
         userService.register(dto);
+
+        User registerUser = userService.findByUsername(dto.getUsername());
+
+        String accessToken = createTokenAndCookie.createToken(registerUser.getUsername(), "UNVERIFIED", "access");
+        Cookie cookie = createTokenAndCookie.createCookie("Authentication",  accessToken);
+        response.addCookie(cookie);
+
         return "redirect:/user/check-email"; // / 붙여주기 맨 앞에
     }
 

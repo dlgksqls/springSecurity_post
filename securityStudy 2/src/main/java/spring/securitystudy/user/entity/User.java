@@ -53,7 +53,7 @@ public class User {
         this.username = dto.getUsername();
         this.password = passwordEncoder.encode(dto.getPassword());
         this.email = dto.getEmail();
-        this.role = Role.USER;
+        this.role = Role.UNVERIFIED;
     }
 
     public void addPost(Post post) {
@@ -67,14 +67,14 @@ public class User {
         this.username = "admin";
         this.email = "1234@naver.com";
         this.password = passwordEncoder.encode("1234");
-        this.role = Role.USER;
+        this.role = Role.UNVERIFIED;
     }
 
     public void createSecondUser(PasswordEncoder passwordEncoder) {
         this.username = "user";
         this.email = "999@naver.com";
         this.password = passwordEncoder.encode("1234");
-        this.role = Role.USER;
+        this.role = Role.UNVERIFIED;
     }
 
     public void requestFriendShip(FriendShip newFriendShip) {
@@ -112,6 +112,7 @@ public class User {
     }
 
     public void enable() {
+        this.role = Role.USER;
         this.enable = true;
     }
 }

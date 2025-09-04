@@ -1,5 +1,8 @@
     package spring.securitystudy.controller;
 
+    import jakarta.servlet.http.Cookie;
+    import jakarta.servlet.http.HttpServletRequest;
+    import jakarta.servlet.http.HttpServletResponse;
     import lombok.RequiredArgsConstructor;
     import org.springframework.data.domain.Page;
     import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,6 +16,7 @@
     import spring.securitystudy.user.service.UserService;
     import spring.securitystudy.post.dto.PostViewDto;
     import spring.securitystudy.post.service.PostService;
+    import spring.securitystudy.util.cookie.CreateTokenAndCookie;
 
     import java.util.List;
 
@@ -20,18 +24,43 @@
     @RequiredArgsConstructor
     public class IndexController {
 
-        private final UserService userService;
         private final PostService postService;
         private final FriendShipService friendShipService;
-        private final LikeService likeService;
+
+        private final CreateTokenAndCookie createTokenAndCookie;
 
         @GetMapping("/")
         public String index(@AuthenticationPrincipal CustomUserDetails loginUser,
                             @RequestParam(defaultValue = "0") int page,
+                            HttpServletRequest request,
+                            HttpServletResponse response,
                             Model model){
 
+            boolean isRefresh = false;
+
             if (loginUser != null) {
-//                List<PostViewDto> allPost = postService.findAll();
+                if (!loginUser.isEnabled()){
+                    return "redirect:/user/check-email";
+                }
+
+                Cookie[] cookies = request.getCookies();
+                if (cookies != null) {
+                    for (Cookie cookie : cookies) {
+                        if (cookie.getName().equals("RefreshToken")) isRefresh = true;
+                    }
+                    if (!isRefresh){
+                        String role = loginUser.getAuthorities().iterator().next().getAuthority();
+                        String accessToken = createTokenAndCookie.createToken(loginUser.getUsername(), role, "access");
+                        String refreshToken = createTokenAndCookie.createToken(loginUser.getUsername(), null, "refresh");
+
+                        Cookie accessCookie = createTokenAndCookie.createCookie("Authentication", accessToken);
+                        Cookie refreshCookie = createTokenAndCookie.createCookie("RefreshToken", refreshToken);
+
+                        response.addCookie(accessCookie);
+                        response.addCookie(refreshCookie);
+                    }
+                }
+
                 Page<PostViewDto> pagePosts = postService.findAllByPage(page, 10, loginUser.getUser());
                 List<String> friendList = friendShipService.findFriendShipList(loginUser.getUser());
 
