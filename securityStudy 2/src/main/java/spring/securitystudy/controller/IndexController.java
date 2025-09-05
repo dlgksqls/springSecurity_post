@@ -13,6 +13,7 @@
     import spring.securitystudy.friendship.service.FriendShipService;
     import spring.securitystudy.like.service.LikeService;
     import spring.securitystudy.user.CustomUserDetails;
+    import spring.securitystudy.user.entity.User;
     import spring.securitystudy.user.service.UserService;
     import spring.securitystudy.post.dto.PostViewDto;
     import spring.securitystudy.post.service.PostService;
@@ -39,8 +40,9 @@
             boolean isRefresh = false;
 
             if (loginUser != null) {
-                if (!loginUser.isEnabled()){
-                    return "redirect:/user/check-email";
+                User user = loginUser.getUser();
+                if (!user.isEnable()){
+                    return "redirect:/verified/check-email?error=check_email";
                 }
 
                 Cookie[] cookies = request.getCookies();
@@ -49,9 +51,9 @@
                         if (cookie.getName().equals("RefreshToken")) isRefresh = true;
                     }
                     if (!isRefresh){
-                        String role = loginUser.getAuthorities().iterator().next().getAuthority();
-                        String accessToken = createTokenAndCookie.createToken(loginUser.getUsername(), role, "access");
-                        String refreshToken = createTokenAndCookie.createToken(loginUser.getUsername(), null, "refresh");
+                        String role = user.getRole().toString();
+                        String accessToken = createTokenAndCookie.createToken(user.getUsername(), role, "access");
+                        String refreshToken = createTokenAndCookie.createToken(user.getUsername(), null, "refresh");
 
                         Cookie accessCookie = createTokenAndCookie.createCookie("Authentication", accessToken);
                         Cookie refreshCookie = createTokenAndCookie.createCookie("RefreshToken", refreshToken);
@@ -61,10 +63,11 @@
                     }
                 }
 
-                Page<PostViewDto> pagePosts = postService.findAllByPage(page, 10, loginUser.getUser());
-                List<String> friendList = friendShipService.findFriendShipList(loginUser.getUser());
+                Page<PostViewDto> pagePosts = postService.findAllByPage(page, 10, user);
+                List<String> friendList = friendShipService.findFriendShipList(user);
 
-                model.addAttribute("username", loginUser.getUsername());
+                model.addAttribute("isEnable", user.isEnable());
+                model.addAttribute("username", user.getUsername());
                 model.addAttribute("posts", pagePosts.getContent());
                 model.addAttribute("friendList", friendList);
                 model.addAttribute("currentPage", page);

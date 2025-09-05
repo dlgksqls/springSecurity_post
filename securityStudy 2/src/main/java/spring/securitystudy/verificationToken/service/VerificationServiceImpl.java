@@ -2,6 +2,7 @@ package spring.securitystudy.verificationToken.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import spring.securitystudy.user.entity.User;
 import spring.securitystudy.util.mail.EmailSender;
 import spring.securitystudy.verificationToken.entity.VerificationToken;
@@ -17,12 +18,13 @@ public class VerificationServiceImpl implements VerificationService{
     private final VerificationTokenRepository tokenRepository;
     private final EmailSender emailSender;
 
+    @Transactional
     @Override
     public void sendVerificationEmail(User user) {
         String token = UUID.randomUUID().toString();
-        VerificationToken verificationToken = new VerificationToken(
-                token, user, LocalDateTime.now().plusHours(24)
-        );
+
+        VerificationToken verificationToken = tokenRepository.findByUser(user)
+                .orElse(new VerificationToken(token, user, LocalDateTime.now().plusHours(24)));
 
         tokenRepository.save(verificationToken);
 
@@ -35,6 +37,7 @@ public class VerificationServiceImpl implements VerificationService{
     }
 
     @Override
+    @Transactional
     public boolean verifyToken(String token) {
         return tokenRepository.findByToken(token)
                 .filter(t -> !t.isExpired())

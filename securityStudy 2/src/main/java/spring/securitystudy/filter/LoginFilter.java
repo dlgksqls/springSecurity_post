@@ -84,7 +84,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
             response.addCookie(unverifiedToken);
 
-            response.sendRedirect(request.getContextPath() + "/user/check-email?error=notVerified");
+            response.sendRedirect(request.getContextPath() + "/verified/check-email?error=notVerified");
             return;
         }
 

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>이메일 인증 안내</title>
+    </head>
+    <body>
+        <h1>이메일 인증 안내</h1>
+
+        <!-- 에러 (링크 만료 등) -->
+<!--        <p th:if="${param.error}">-->
+<!--            인증 링크가 유효하지 않거나 만료되었습니다. <br>-->
+<!--            다시 이메일을 확인하거나 회원가입을 진행해주세요. <br>-->
+<!--            메일이 오지 않았습니까? <br>-->
+<!--            <a href="/sendMail">다시 보내기</a>-->
+<!--        </p>-->
+        <!-- 에러 메시지 -->
+        <p th:if="${param.error}" style="color: red">
+            [[${param.error}]]
+        </p>
+
+        <!-- 정상적으로 메일 보낸 경우 -->
+        <p th:if="${!#bools.isTrue(isEnable)}">
+            이메일 인증이 필요합니다. <br>
+            인증 메일을 확인해주세요. <br>
+            <a href="/sendMail">다시 보내기</a><br>
+            <a href="/">홈으로 가기</a><br>
+        <form action="/user/logout" method="post">
+            <button type="submit">로그아웃</button>
+        </form>
+        </p>
+
+        <p th:if="${#bools.isTrue(isEnable)}">
+            인증을 하셨습니다. <br>
+            다시 로그인 해주세요.
+            <a href="/user/login">로그인</a>
+        </p>
+    </body>
+</html>
