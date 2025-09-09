@@ -2,6 +2,7 @@ package spring.securitystudy.user.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import spring.securitystudy.comment.entity.Comment;
 import spring.securitystudy.friendship.entity.FriendShip;
@@ -30,8 +31,10 @@ public class User {
     private boolean isFriendOnly = false;
 
     @Enumerated(EnumType.STRING)
+    @Setter
     private Role role;
 
+    @Setter
     private boolean enable = false; // 이메일 인증 여부
 
     @OneToMany(mappedBy = "user",  cascade = CascadeType.REMOVE)
@@ -67,14 +70,16 @@ public class User {
         this.username = "admin";
         this.email = "1234@naver.com";
         this.password = passwordEncoder.encode("1234");
-        this.role = Role.UNVERIFIED;
+        this.enable = true;
+        this.role = Role.USER;
     }
 
     public void createSecondUser(PasswordEncoder passwordEncoder) {
         this.username = "user";
         this.email = "999@naver.com";
         this.password = passwordEncoder.encode("1234");
-        this.role = Role.UNVERIFIED;
+        this.enable = true;
+        this.role = Role.USER;
     }
 
     public void requestFriendShip(FriendShip newFriendShip) {

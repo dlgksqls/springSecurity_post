@@ -26,8 +26,7 @@ public class VerificationController {
     }
 
     @GetMapping("/verify")
-    public String verifyEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
-                              @RequestParam String token,
+    public String verifyEmail(@RequestParam String token,
                               RedirectAttributes redirectAttributes){
         boolean verified = verificationService.verifyToken(token);
 
@@ -35,7 +34,7 @@ public class VerificationController {
             return "redirect:/user/login";
         }
         else{
-            redirectAttributes.addFlashAttribute("isEnable", userDetails.getUser().isEnable());
+            redirectAttributes.addFlashAttribute("enable", false);
             return "redirect:/verified/check-email?error=true";
         }
     }

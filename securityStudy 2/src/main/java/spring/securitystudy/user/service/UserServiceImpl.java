@@ -92,11 +92,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfile findPostByUsername(String username) {
         User findUser = findByUsername(username);
-        List<Post> postByUsername = postRepository.findByUsername(username);
+        List<Post> posts = postRepository.findByUsername(username);
+        List<Long> postIds = posts.stream().map(Post::getId).toList();
+
+        Map<Long, Long> likeCounts = postRepository.countLikesByPostsIds(postIds).stream()
+                .collect(Collectors.toMap(
+                    arr -> (Long) arr[0],
+                    arr -> (Long) arr[1]
+                ));
+
         List<PostViewDto> postDto = new ArrayList<>();
-        for (Post post : postByUsername) {
+        for (Post post : posts) {
             List<String> imageUrls = post.getImageList().stream().map(Image::getUrl).collect(Collectors.toList());
-            postDto.add(new PostViewDto(post, imageUrls, post.getLikeCnt(), true));
+
+            long likeCount = likeCounts.getOrDefault(post.getId(), 0L);
+            postDto.add(new PostViewDto(post, imageUrls, likeCount, true));
         }
         return UserProfile.builder()
                 .username(username)

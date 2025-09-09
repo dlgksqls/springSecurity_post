@@ -4,6 +4,9 @@ import org.springframework.stereotype.Service;
 import spring.securitystudy.post.entity.Post;
 import spring.securitystudy.user.entity.User;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface LikeService {
 
     /**
@@ -13,5 +16,7 @@ public interface LikeService {
      */
     void handleLike(Long postId, User loginUser);
 
-    boolean likedByLoginUser(Post post, User user);
+    List<User> likeUserPost(Long postId);
+
+    List<Post> userLike(Long userId);
 }

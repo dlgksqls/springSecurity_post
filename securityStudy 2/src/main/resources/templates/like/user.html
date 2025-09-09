@@ -1,0 +1,7 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <h1 style="color: red">좋아요 누른 사람들</h1>
+    <div th:each="username:${usernames}">
+        <p th:text="${username}"></p>
+    </div>
+</html>

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import spring.securitystudy.user.dto.UserRegisterDto;
+import spring.securitystudy.user.entity.Role;
 import spring.securitystudy.user.entity.User;
 import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.post.dto.PostCreateDto;
@@ -44,6 +45,8 @@ public class init {
             UserDto.setPassword(Integer.toString(1234));
             UserDto.setEmail(i * 5 + "@email.com");
             user.createUser(UserDto, passwordEncoder);
+            user.setEnable(true);
+            user.setRole(Role.USER);
             userRepository.save(user);
 
             PostCreateDto postDto = new PostCreateDto();

@@ -60,7 +60,10 @@ public class PostServiceImpl implements PostService {
         PageRequest pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
         Page<PostViewDto> pagePosts = postRepository.findAllWithMember(pageable);
 
+        // 페이지 별로 post 불러오기
         List<Long> postIds = pagePosts.stream().map(PostViewDto::getId).toList();
+
+        // post 별로 이미지 불러오기
         List<Image> images = imageRepository.findAllByPostId(postIds);
         Map<Long, List<String>> postImage = images.stream()
                 .collect(Collectors.groupingBy(
@@ -68,12 +71,21 @@ public class PostServiceImpl implements PostService {
                         Collectors.mapping(Image::getUrl, Collectors.toList())
                 ));
 
+        // 좋아요 처리
+        Map<Long, Long> likeCounts = postRepository.countLikesByPostsIds(postIds).stream()
+                .collect(Collectors.toMap(
+                        arr -> (Long) arr[0],
+                        arr -> (Long) arr[1]
+                ));
+
+        // 로그인 유저 좋아요 여부
         Set<Long> likePostIds = (loginUser != null) ?
-                new HashSet<>(likeRepository.findByUser(loginUser))
+                new HashSet<>(likeRepository.findLikeByLoginUserAndPostIds(loginUser.getId(), postIds))
                 : new HashSet<>();
 
         pagePosts.forEach(postViewDto -> {
             postViewDto.setImageUrls(postImage.getOrDefault(postViewDto.getId(), List.of()));
+            postViewDto.setLikeCnt(likeCounts.getOrDefault(postViewDto.getId(), 0L));
             postViewDto.setLikeByLoginUser(likePostIds.contains(postViewDto.getId()));
         });
 

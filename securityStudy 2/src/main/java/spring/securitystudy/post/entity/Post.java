@@ -22,7 +22,6 @@ public class Post {
     private Long id;
     private String title;
     private String content;
-    private int likeCnt = 0;
     private LocalDate createdDate;
     private LocalDate updatedDate;
 
@@ -81,11 +80,9 @@ public class Post {
 
     public void addLike(Like like) {
         this.likeList.add(like);
-        this.likeCnt ++;
     }
 
     public void removeLike(Like deleteLike) {
         this.likeList.remove(deleteLike);
-        this.likeCnt --;
     }
 }

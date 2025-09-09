@@ -4,7 +4,9 @@ import lombok.Data;
 import spring.securitystudy.post.entity.Post;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class PostViewDto {
@@ -14,7 +16,7 @@ public class PostViewDto {
     private boolean isFriend;
     private String writer;
     private List<String> imageUrls;
-    private int likeCnt;
+    private long likeCnt;
     private boolean likeByLoginUser;
     private LocalDate createdDate;
 
@@ -23,18 +25,16 @@ public class PostViewDto {
                        String content,
                        String writer,
                        boolean isFriend,
-                       int likeCnt,
                        LocalDate createdDate) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.writer = writer;
         this.isFriend = isFriend;
-        this.likeCnt = likeCnt;
         this.createdDate = createdDate;
     }
 
-    public PostViewDto(Post post, List<String> imageUrls, int likeCnt, boolean isFriend) {
+    public PostViewDto(Post post, List<String> imageUrls, long likeCnt, boolean isFriend) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();

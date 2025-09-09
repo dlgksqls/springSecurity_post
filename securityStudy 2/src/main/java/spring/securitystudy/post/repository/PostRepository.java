@@ -11,6 +11,7 @@ import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
@@ -25,7 +26,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * Post 10개에 Image 20개 있으면 → 결과 row는 20개 (중복된 Post가 생김) => error
      */
     @Query(
-            value = "SELECT new spring.securitystudy.post.dto.PostViewDto(p.id, p.title, p.content, p.user.username, p.user.isFriendOnly, p.likeCnt, p.createdDate) " +
+            value = "SELECT new spring.securitystudy.post.dto.PostViewDto(p.id, p.title, p.content, p.user.username, p.user.isFriendOnly, p.createdDate) " +
                     "FROM Post p JOIN p.user " +
                     "ORDER BY p.id DESC",
             countQuery = "SELECT COUNT(p) FROM Post p"
@@ -42,4 +43,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "FROM Image i " +
             "WHERE i.post.id = :id")
     List<ImageUrlsDto> findImageByPostId(@Param(value = "id") Long id);
+
+    @Query(value = "SELECT l.post.id, COUNT(l) FROM Like l WHERE l.post.id IN :postIds GROUP BY l.post.id")
+    List<Object[]> countLikesByPostsIds(@Param("postIds") List<Long> postIds);
 }

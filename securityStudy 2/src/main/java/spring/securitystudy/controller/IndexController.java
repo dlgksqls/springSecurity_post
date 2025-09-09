@@ -12,6 +12,7 @@
     import org.springframework.web.bind.annotation.RequestParam;
     import spring.securitystudy.friendship.service.FriendShipService;
     import spring.securitystudy.like.service.LikeService;
+    import spring.securitystudy.post.entity.Post;
     import spring.securitystudy.user.CustomUserDetails;
     import spring.securitystudy.user.entity.User;
     import spring.securitystudy.user.service.UserService;
@@ -27,6 +28,7 @@
 
         private final PostService postService;
         private final FriendShipService friendShipService;
+        private final LikeService likeService;
 
         private final CreateTokenAndCookie createTokenAndCookie;
 
@@ -65,6 +67,11 @@
 
                 Page<PostViewDto> pagePosts = postService.findAllByPage(page, 10, user);
                 List<String> friendList = friendShipService.findFriendShipList(user);
+                List<Long> likePostIds = likeService.userLike(user.getId()).stream().map(Post :: getId).toList();
+
+                pagePosts.forEach(postViewDto -> {
+                    postViewDto.setLikeByLoginUser(likePostIds.contains(postViewDto.getId()));
+                });
 
                 model.addAttribute("isEnable", user.isEnable());
                 model.addAttribute("username", user.getUsername());
