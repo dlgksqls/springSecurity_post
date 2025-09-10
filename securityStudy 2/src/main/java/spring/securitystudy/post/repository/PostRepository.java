@@ -21,17 +21,20 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 //    @Query("SELECT DISTINCT p FROM Post p JOIN FETCH p.member")
 //    List<Post> findAllWithMember();
 
-    /**
-     * 컬렉션은 1:N 관계라서,
-     * Post 10개에 Image 20개 있으면 → 결과 row는 20개 (중복된 Post가 생김) => error
-     */
-    @Query(
-            value = "SELECT new spring.securitystudy.post.dto.PostViewDto(p.id, p.title, p.content, p.user.username, p.user.isFriendOnly, p.createdDate) " +
-                    "FROM Post p JOIN p.user " +
-                    "ORDER BY p.id DESC",
-            countQuery = "SELECT COUNT(p) FROM Post p"
-    )
-    Page<PostViewDto> findAllWithMember(Pageable pageable);
+//    /**
+//     * 컬렉션은 1:N 관계라서,
+//     * Post 10개에 Image 20개 있으면 → 결과 row는 20개 (중복된 Post가 생김) => error
+//     */
+//    @Query(
+//            value = "SELECT new spring.securitystudy.post.dto.PostViewDto(p.id, p.title, p.content, p.user.username, p.user.isFriendOnly, p.createdDate) " +
+//                    "FROM Post p JOIN p.user " +
+//                    "ORDER BY p.id DESC",
+//            countQuery = "SELECT COUNT(p) FROM Post p"
+//    )
+
+    @Query(value = "SELECT p FROM Post p JOIN FETCH p.user u ORDER BY p.id DESC",
+            countQuery = "SELECT COUNT (p) FROM Post p")
+    Page<Post> findAllWithMember(Pageable pageable);
 
     @Query(value = "SELECT new spring.securitystudy.comment.dto.CommentDto(c.id, c.content, c.user.username, c.createdDate, c.updateDate) " +
             "FROM Comment c JOIN c.user cu " +

@@ -34,14 +34,26 @@ public class PostViewDto {
         this.createdDate = createdDate;
     }
 
+    public PostViewDto(Post post, List<String> imageUrls, long likeCnt, boolean likeByLoginUser, boolean isFriend) {
+        this.id = post.getId();
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.writer = post.getUser().getUsername();
+        this.imageUrls = imageUrls;
+        this.likeCnt = likeCnt;
+        this.likeByLoginUser = likeByLoginUser;
+        this.isFriend = isFriend;
+        this.createdDate = post.getCreatedDate();
+    }
+
     public PostViewDto(Post post, List<String> imageUrls, long likeCnt, boolean isFriend) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.writer = post.getUser().getUsername();
-        this.isFriend = isFriend;
         this.imageUrls = imageUrls;
         this.likeCnt = likeCnt;
+        this.isFriend = isFriend;
         this.createdDate = post.getCreatedDate();
     }
 }

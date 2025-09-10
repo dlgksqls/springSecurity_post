@@ -8,6 +8,7 @@ import spring.securitystudy.exception.UserNotFoundException;
 import spring.securitystudy.friendship.entity.Status;
 import spring.securitystudy.friendship.repository.FriendShipRepository;
 import spring.securitystudy.image.entity.Image;
+import spring.securitystudy.like.repository.LikeRepository;
 import spring.securitystudy.user.dto.UserProfile;
 import spring.securitystudy.user.dto.UserRegisterDto;
 import spring.securitystudy.user.dto.UserUpdateDto;
@@ -17,6 +18,8 @@ import spring.securitystudy.user.repository.UserRepository;
 import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
 import spring.securitystudy.post.repository.PostRepository;
+import spring.securitystudy.util.like.LikeUtil;
+import spring.securitystudy.util.post.PostUtil;
 import spring.securitystudy.verificationToken.service.VerificationService;
 
 import java.util.*;
@@ -93,21 +96,14 @@ public class UserServiceImpl implements UserService {
     public UserProfile findPostByUsername(String username) {
         User findUser = findByUsername(username);
         List<Post> posts = postRepository.findByUsername(username);
-        List<Long> postIds = posts.stream().map(Post::getId).toList();
 
-        Map<Long, Long> likeCounts = postRepository.countLikesByPostsIds(postIds).stream()
-                .collect(Collectors.toMap(
-                    arr -> (Long) arr[0],
-                    arr -> (Long) arr[1]
-                ));
+        List<Long> postIds = PostUtil.getPostIds(posts);
 
-        List<PostViewDto> postDto = new ArrayList<>();
-        for (Post post : posts) {
-            List<String> imageUrls = post.getImageList().stream().map(Image::getUrl).collect(Collectors.toList());
+        List<Object[]> likeObjects = postRepository.countLikesByPostsIds(postIds);
+        Map<Long, Long> likeCounts = LikeUtil.countLikesByPostsIds(likeObjects);
 
-            long likeCount = likeCounts.getOrDefault(post.getId(), 0L);
-            postDto.add(new PostViewDto(post, imageUrls, likeCount, true));
-        }
+        List<PostViewDto> postDto = PostUtil.makePostViewDto(posts, likeCounts);
+
         return UserProfile.builder()
                 .username(username)
                 .role(findUser.getRole())
@@ -121,13 +117,17 @@ public class UserServiceImpl implements UserService {
         for (User user : findMemberList) {
             Status status = friendShipRepository.findStatus(loginMember, user);
 
-            if (status != null){
-                findMemberFriendShipList.put(user.getUsername(), status.name());
-            }
-            else findMemberFriendShipList.put(user.getUsername(), null);
+            handleFriendShip(user, status, findMemberFriendShipList);
         }
 
         return findMemberFriendShipList;
+    }
+
+    private static void handleFriendShip(User user, Status status, Map<String, String> findMemberFriendShipList) {
+        if (status != null){
+            findMemberFriendShipList.put(user.getUsername(), status.name());
+        }
+        else findMemberFriendShipList.put(user.getUsername(), null);
     }
 
     private boolean isUsernameDuplicate(String username) {

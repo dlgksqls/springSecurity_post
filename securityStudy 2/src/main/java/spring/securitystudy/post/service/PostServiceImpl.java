@@ -3,6 +3,7 @@ package spring.securitystudy.post.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,9 @@ import spring.securitystudy.post.dto.PostUpdateDto;
 import spring.securitystudy.post.dto.PostViewDto;
 import spring.securitystudy.post.entity.Post;
 import spring.securitystudy.post.repository.PostRepository;
+import spring.securitystudy.util.image.ImageUtil;
+import spring.securitystudy.util.like.LikeUtil;
+import spring.securitystudy.util.post.PostUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,38 +62,23 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<PostViewDto> findAllByPage(int page, int size, User loginUser){
         PageRequest pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
-        Page<PostViewDto> pagePosts = postRepository.findAllWithMember(pageable);
+        Page<Post> pagePosts = postRepository.findAllWithMember(pageable);
 
         // 페이지 별로 post 불러오기
-        List<Long> postIds = pagePosts.stream().map(PostViewDto::getId).toList();
+        List<Long> postIds = PostUtil.getPostIds(pagePosts.getContent());
 
         // post 별로 이미지 불러오기
-        List<Image> images = imageRepository.findAllByPostId(postIds);
-        Map<Long, List<String>> postImage = images.stream()
-                .collect(Collectors.groupingBy(
-                        image -> image.getPost().getId(),
-                        Collectors.mapping(Image::getUrl, Collectors.toList())
-                ));
+        Map<Long, List<String>> postImage = getPostImage(postIds);
 
         // 좋아요 처리
-        Map<Long, Long> likeCounts = postRepository.countLikesByPostsIds(postIds).stream()
-                .collect(Collectors.toMap(
-                        arr -> (Long) arr[0],
-                        arr -> (Long) arr[1]
-                ));
+        Map<Long, Long> likeCounts = countPostLike(postIds);
 
         // 로그인 유저 좋아요 여부
-        Set<Long> likePostIds = (loginUser != null) ?
-                new HashSet<>(likeRepository.findLikeByLoginUserAndPostIds(loginUser.getId(), postIds))
-                : new HashSet<>();
+        Set<Long> likePostIds = loginUserLikePost(loginUser, postIds);
 
-        pagePosts.forEach(postViewDto -> {
-            postViewDto.setImageUrls(postImage.getOrDefault(postViewDto.getId(), List.of()));
-            postViewDto.setLikeCnt(likeCounts.getOrDefault(postViewDto.getId(), 0L));
-            postViewDto.setLikeByLoginUser(likePostIds.contains(postViewDto.getId()));
-        });
+        List<PostViewDto> dtoList = pageToPostViewDto(pagePosts, postImage, likeCounts, likePostIds);
 
-        return pagePosts;
+        return new PageImpl<>(dtoList, pageable, pagePosts.getTotalElements());
     }
 
     @Override
@@ -121,5 +110,37 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> findByUsername(String username) {
         return postRepository.findByUsername(username);
+    }
+
+    private Map<Long, List<String>> getPostImage(List<Long> postIds) {
+        List<Image> images = imageRepository.findAllByPostId(postIds);
+        Map<Long, List<String>> postImage = ImageUtil.getAllImages(images);
+        return postImage;
+    }
+
+    private Map<Long, Long> countPostLike(List<Long> postIds) {
+        List<Object[]> likeObjects = postRepository.countLikesByPostsIds(postIds);
+        Map<Long, Long> likeCounts = LikeUtil.countLikesByPostsIds(likeObjects);
+        return likeCounts;
+    }
+
+    private Set<Long> loginUserLikePost(User loginUser, List<Long> postIds) {
+        Set<Long> likePostIds = (loginUser != null) ?
+                new HashSet<>(likeRepository.findLikeByLoginUserAndPostIds(loginUser.getId(), postIds))
+                : new HashSet<>();
+        return likePostIds;
+    }
+
+    private static List<PostViewDto> pageToPostViewDto(Page<Post> pagePosts, Map<Long, List<String>> postImage, Map<Long, Long> likeCounts, Set<Long> likePostIds) {
+        List<PostViewDto> dtoList = pagePosts.getContent().stream()
+                .map(post -> new PostViewDto(
+                        post,
+                        postImage.getOrDefault(post.getId(), List.of()),
+                        likeCounts.getOrDefault(post.getId(), 0L),
+                        likePostIds.contains(post.getId()),
+                        post.getUser().isFriendOnly()
+                ))
+                .toList();
+        return dtoList;
     }
 }
